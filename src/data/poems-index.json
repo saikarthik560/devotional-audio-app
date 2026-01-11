@@ -1,0 +1,50 @@
+[
+  {
+    "id": "poem-001",
+    "title": "Krishna Bhajan",
+    "deity": "Krishna",
+    "mood": "Calm",
+    "language": "Sanskrit",
+    "duration": "04:01",
+    "recorded_by": "Grandfather",
+    "recorded_year": "2023",
+    "audioUrl": "/poems/poem-001/audio.mp3",
+    "deityImageUrl": "/poems/poem-001/deity.png",
+    "backgroundUrl": "/poems/poem-001/background.jpg",
+    "hasAudio": true,
+    "hasDeityImage": true,
+    "hasBackground": true
+  },
+  {
+    "id": "poem-002",
+    "title": "Shiva Stotram",
+    "deity": "Shiva",
+    "mood": "Meditative",
+    "language": "Telugu",
+    "duration": "05:15",
+    "recorded_by": "Grandfather",
+    "recorded_year": "2022",
+    "audioUrl": "/poems/poem-002/audio.mp3",
+    "deityImageUrl": "/poems/poem-002/deity.png",
+    "backgroundUrl": "/poems/poem-002/background.jpg",
+    "hasAudio": false,
+    "hasDeityImage": false,
+    "hasBackground": false
+  },
+  {
+    "id": "poem-003",
+    "title": "Devi Kavacham",
+    "deity": "Devi",
+    "mood": "Energetic",
+    "language": "Hindi",
+    "duration": "06:48",
+    "recorded_by": "Grandfather",
+    "recorded_year": "2024",
+    "audioUrl": "/poems/poem-003/audio.mp3",
+    "deityImageUrl": "/poems/poem-003/deity.png",
+    "backgroundUrl": "/poems/poem-003/background.jpg",
+    "hasAudio": false,
+    "hasDeityImage": false,
+    "hasBackground": false
+  }
+]

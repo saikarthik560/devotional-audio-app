@@ -1,3 +1,5 @@
+import poemsIndex from "@/data/poems-index.json";
+
 export interface PoemMeta {
   id: string;
   title: string;
@@ -18,37 +20,8 @@ export interface Poem extends PoemMeta {
   hasBackground: boolean;
 }
 
-const POEM_FOLDERS = ["poem-001", "poem-002", "poem-003", "poem-004", "poem-005", "poem-006", "poem-007", "poem-008", "poem-009", "poem-010"];
-
 export async function getAllPoems(): Promise<Poem[]> {
-  const poems: Poem[] = [];
-
-  for (const folder of POEM_FOLDERS) {
-    try {
-      const response = await fetch(`/poems/${folder}/meta.json`);
-      if (!response.ok) continue;
-      
-      const meta: PoemMeta = await response.json();
-      
-      const audioResponse = await fetch(`/poems/${folder}/audio.mp3`, { method: "HEAD" }).catch(() => null);
-      const deityResponse = await fetch(`/poems/${folder}/deity.png`, { method: "HEAD" }).catch(() => null);
-      const backgroundResponse = await fetch(`/poems/${folder}/background.jpg`, { method: "HEAD" }).catch(() => null);
-
-      poems.push({
-        ...meta,
-        audioUrl: `/poems/${folder}/audio.mp3`,
-        deityImageUrl: `/poems/${folder}/deity.png`,
-        backgroundUrl: `/poems/${folder}/background.jpg`,
-        hasAudio: audioResponse?.ok ?? false,
-        hasDeityImage: deityResponse?.ok ?? false,
-        hasBackground: backgroundResponse?.ok ?? false,
-      });
-    } catch {
-      continue;
-    }
-  }
-
-  return poems;
+  return poemsIndex as Poem[];
 }
 
 export async function getPoemById(id: string): Promise<Poem | null> {
