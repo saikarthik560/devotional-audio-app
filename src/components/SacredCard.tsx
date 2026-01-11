@@ -12,9 +12,9 @@ interface SacredCardProps {
 
 export function SacredCard({ poem, index }: SacredCardProps) {
   return (
-    <Link href={`/poem/${poem.id}`}>
+    <Link href={`/poem/${poem.id}`} className="touch-none">
       <motion.div
-        className="relative group cursor-pointer"
+        className="relative group cursor-pointer active:scale-95 transition-transform duration-300"
         initial={{ opacity: 0, y: 30, rotateX: 15 }}
         animate={{ opacity: 1, y: 0, rotateX: 0 }}
         transition={{
@@ -28,14 +28,15 @@ export function SacredCard({ poem, index }: SacredCardProps) {
           rotateX: -5,
           rotateY: 5,
         }}
+        whileTap={{ scale: 0.94, rotateX: 0, rotateY: 0 }}
         style={{
           perspective: "1000px",
           transformStyle: "preserve-3d",
         }}
       >
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-950/40 via-slate-900/60 to-slate-950/80 border border-amber-800/20 backdrop-blur-sm">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-950/40 via-slate-900/60 to-slate-950/80 border border-amber-800/20 backdrop-blur-md">
           <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-500/5 to-transparent"
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-500/10 to-transparent"
             animate={{
               x: ["-200%", "200%"],
             }}
@@ -50,19 +51,19 @@ export function SacredCard({ poem, index }: SacredCardProps) {
           <motion.div
             className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700"
             style={{
-              background: "radial-gradient(circle at 50% 50%, rgba(218, 165, 32, 0.1) 0%, transparent 60%)",
+              background: "radial-gradient(circle at 50% 50%, rgba(218, 165, 32, 0.15) 0%, transparent 60%)",
             }}
           />
 
           <div className="relative p-6">
-            <div className="flex items-start gap-4">
-              <div className="relative w-20 h-20 flex-shrink-0">
+            <div className="flex items-center gap-5">
+              <div className="relative w-24 h-24 flex-shrink-0">
                 <motion.div
                   className="absolute inset-0 rounded-full"
                   animate={{
                     boxShadow: [
                       "0 0 20px rgba(218, 165, 32, 0.2)",
-                      "0 0 30px rgba(218, 165, 32, 0.3)",
+                      "0 0 40px rgba(218, 165, 32, 0.4)",
                       "0 0 20px rgba(218, 165, 32, 0.2)",
                     ],
                   }}
@@ -78,15 +79,15 @@ export function SacredCard({ poem, index }: SacredCardProps) {
                     src={poem.deityImageUrl}
                     alt={poem.deity}
                     fill
-                    className="object-cover rounded-full"
+                    className="object-cover rounded-full border border-amber-500/30"
                   />
                 ) : (
-                  <div className="w-full h-full rounded-full bg-gradient-to-br from-amber-600/30 to-amber-900/30 flex items-center justify-center">
+                  <div className="w-full h-full rounded-full bg-gradient-to-br from-amber-600/30 to-amber-900/30 flex items-center justify-center border border-amber-500/30">
                     <Image
                       src="/icons/om.svg"
                       alt="Om"
-                      width={40}
-                      height={40}
+                      width={48}
+                      height={48}
                       className="opacity-60"
                     />
                   </div>
@@ -95,7 +96,7 @@ export function SacredCard({ poem, index }: SacredCardProps) {
 
               <div className="flex-1 min-w-0">
                 <motion.h3
-                  className="font-serif text-xl text-amber-100 mb-1 truncate"
+                  className="font-serif text-2xl text-amber-100 mb-1 truncate tracking-wide"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: index * 0.1 + 0.2 }}
@@ -103,11 +104,11 @@ export function SacredCard({ poem, index }: SacredCardProps) {
                   {poem.title}
                 </motion.h3>
                 
-                <p className="text-amber-300/60 text-sm mb-3">
+                <p className="text-amber-300/70 text-sm mb-3 font-serif">
                   {poem.deity} • {poem.mood}
                 </p>
 
-                <div className="flex items-center gap-3 text-xs text-amber-200/40">
+                <div className="flex items-center gap-3 text-[10px] uppercase tracking-widest text-amber-200/40 font-sans font-medium">
                   <span>{poem.language}</span>
                   <span className="w-1 h-1 rounded-full bg-amber-500/30" />
                   <span>{poem.duration}</span>
@@ -118,29 +119,28 @@ export function SacredCard({ poem, index }: SacredCardProps) {
             </div>
 
             <motion.div
-              className="mt-4 pt-4 border-t border-amber-800/20 flex items-center justify-between"
+              className="mt-6 pt-4 border-t border-amber-800/20 flex items-center justify-between"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: index * 0.1 + 0.3 }}
             >
-              <span className="text-amber-200/50 text-xs font-serif">
+              <span className="text-amber-200/50 text-xs font-serif italic">
                 Sung by {poem.recorded_by}
               </span>
               
               <motion.div
-                className="flex items-center gap-2 text-amber-400/60 text-xs"
+                className="flex items-center gap-2 text-amber-400/80 text-sm font-serif"
                 whileHover={{ x: 3 }}
               >
                 {poem.hasAudio ? (
                   <>
-                    <span>Listen</span>
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <span>Begin Devotion</span>
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                   </>
                 ) : (
-                  <span className="text-amber-500/40">Coming soon</span>
+                  <span className="text-amber-500/40">Preparing...</span>
                 )}
               </motion.div>
             </motion.div>
@@ -150,8 +150,8 @@ export function SacredCard({ poem, index }: SacredCardProps) {
         <motion.div
           className="absolute -inset-1 rounded-2xl opacity-0 group-hover:opacity-100 -z-10 transition-opacity duration-500"
           style={{
-            background: "linear-gradient(135deg, rgba(218, 165, 32, 0.1) 0%, transparent 50%, rgba(70, 130, 180, 0.1) 100%)",
-            filter: "blur(10px)",
+            background: "linear-gradient(135deg, rgba(218, 165, 32, 0.2) 0%, transparent 50%, rgba(70, 130, 180, 0.15) 100%)",
+            filter: "blur(15px)",
           }}
         />
       </motion.div>

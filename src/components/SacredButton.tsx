@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useAnimation } from "framer-motion";
 import { ReactNode } from "react";
 
 interface SacredButtonProps {
@@ -20,7 +20,9 @@ export function SacredButton({
   disabled = false,
   className = "",
 }: SacredButtonProps) {
-  const baseStyles = "relative overflow-hidden rounded-full font-serif tracking-wider transition-all duration-500";
+  const controls = useAnimation();
+
+  const baseStyles = "relative overflow-hidden rounded-full font-serif tracking-wider transition-all duration-500 active:scale-95 touch-manipulation";
   
   const variantStyles = {
     primary: "bg-gradient-to-r from-amber-900/60 via-amber-800/50 to-amber-900/60 border border-amber-600/30 text-amber-100",
@@ -34,23 +36,35 @@ export function SacredButton({
     lg: "px-12 py-4 text-lg",
   };
 
+  const handleTap = async () => {
+    await controls.start({
+      boxShadow: [
+        "0 0 20px rgba(218, 165, 32, 0.2)",
+        "0 0 60px rgba(218, 165, 32, 0.6)",
+        "0 0 20px rgba(218, 165, 32, 0.2)",
+      ],
+      transition: { duration: 0.4 }
+    });
+    if (onClick) onClick();
+  };
+
   return (
     <motion.button
       className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
-      onClick={onClick}
+      onTap={handleTap}
       disabled={disabled}
       whileHover={{ scale: 1.02, y: -2 }}
-      whileTap={{ scale: 0.98 }}
+      whileTap={{ scale: 0.92 }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{
         type: "spring",
-        stiffness: 200,
-        damping: 20,
+        stiffness: 300,
+        damping: 15,
       }}
     >
       <motion.div
-        className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-400/10 to-transparent"
+        className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-400/20 to-transparent"
         animate={{
           x: ["-100%", "100%"],
         }}
@@ -64,11 +78,19 @@ export function SacredButton({
       
       <motion.div
         className="absolute inset-0 rounded-full"
+        animate={controls}
+        initial={{
+          boxShadow: "0 0 20px rgba(218, 165, 32, 0.1), inset 0 0 20px rgba(218, 165, 32, 0.05)",
+        }}
+      />
+
+      <motion.div
+        className="absolute inset-0 rounded-full"
         animate={{
           boxShadow: [
-            "0 0 20px rgba(218, 165, 32, 0.1), inset 0 0 20px rgba(218, 165, 32, 0.05)",
-            "0 0 30px rgba(218, 165, 32, 0.2), inset 0 0 30px rgba(218, 165, 32, 0.1)",
-            "0 0 20px rgba(218, 165, 32, 0.1), inset 0 0 20px rgba(218, 165, 32, 0.05)",
+            "0 0 15px rgba(218, 165, 32, 0.1)",
+            "0 0 25px rgba(218, 165, 32, 0.2)",
+            "0 0 15px rgba(218, 165, 32, 0.1)",
           ],
         }}
         transition={{

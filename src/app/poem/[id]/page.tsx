@@ -6,7 +6,7 @@ import { ParticleSystem } from "@/components/ParticleSystem";
 import { GlowLayer } from "@/components/GlowLayer";
 import { getPoemById, Poem } from "@/lib/poems";
 import { useAudioAnalyzer } from "@/hooks/useAudioAnalyzer";
-import { useEffect, useState, useCallback, use } from "react";
+import { useEffect, useState, useCallback, use, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -20,6 +20,7 @@ export default function PoemPlayerPage({ params }: PoemPlayerPageProps) {
   const [loading, setLoading] = useState(true);
   const [sacredMode, setSacredMode] = useState(false);
   const showControls = !sacredMode;
+  const seekRef = useRef<HTMLDivElement>(null);
 
   const {
     audioLevel,
@@ -75,9 +76,11 @@ export default function PoemPlayerPage({ params }: PoemPlayerPageProps) {
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
-  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const percent = (e.clientX - rect.left) / rect.width;
+  const handleSeek = (e: React.MouseEvent | React.TouchEvent) => {
+    if (!seekRef.current) return;
+    const rect = seekRef.current.getBoundingClientRect();
+    const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
+    const percent = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
     seek(percent * duration);
   };
 
@@ -132,7 +135,7 @@ export default function PoemPlayerPage({ params }: PoemPlayerPageProps) {
 
   return (
     <div
-      className="relative min-h-screen bg-[#0a0a14] overflow-hidden"
+      className="relative min-h-screen bg-[#0a0a14] overflow-hidden touch-none"
       onClick={() => sacredMode && setSacredMode(false)}
     >
       <LayeredBackground backgroundImage={poem.hasBackground ? poem.backgroundUrl : undefined} intensity={1.2 + audioLevel * 0.5} />
@@ -153,9 +156,9 @@ export default function PoemPlayerPage({ params }: PoemPlayerPageProps) {
               className="absolute inset-0"
               style={{
                 background: `radial-gradient(ellipse at center, 
-                  transparent 30%, 
-                  rgba(0, 0, 0, 0.5) 70%, 
-                  rgba(0, 0, 0, 0.9) 100%)`,
+                  transparent 20%, 
+                  rgba(0, 0, 0, 0.6) 60%, 
+                  rgba(0, 0, 0, 0.95) 100%)`,
               }}
             />
           </motion.div>
@@ -171,37 +174,37 @@ export default function PoemPlayerPage({ params }: PoemPlayerPageProps) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <header className="p-4 md:p-8">
+            <header className="p-6 md:p-8">
               <div className="flex items-center justify-between">
                 <Link
                   href="/library"
-                  className="flex items-center gap-3 text-amber-400/60 hover:text-amber-300 transition-colors duration-500"
+                  className="flex items-center gap-3 text-amber-400/60 hover:text-amber-300 transition-colors duration-500 p-2"
                 >
-                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                   </svg>
-                  <span className="font-serif text-sm">Library</span>
+                  <span className="font-serif text-base">Library</span>
                 </Link>
 
                 <motion.button
                   onClick={() => setSacredMode(true)}
-                  className="flex items-center gap-2 text-amber-400/50 hover:text-amber-300 transition-colors duration-500 font-serif text-sm"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                  className="flex items-center gap-2 text-amber-400/50 hover:text-amber-300 transition-colors duration-500 font-serif text-sm p-2"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   <span>Sacred Mode</span>
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                   </svg>
                 </motion.button>
               </div>
             </header>
 
-            <main className="flex-1 flex flex-col items-center justify-center px-4 pb-32">
+            <main className="flex-1 flex flex-col items-center justify-center px-6 pb-24">
               <motion.div
-                className="relative mb-8"
+                className="relative mb-10"
                 animate={{
-                  scale: 1 + audioLevel * 0.05,
+                  scale: 1 + audioLevel * 0.08,
                 }}
                 transition={{ duration: 0.1 }}
               >
@@ -209,37 +212,37 @@ export default function PoemPlayerPage({ params }: PoemPlayerPageProps) {
                   className="absolute inset-0 rounded-full"
                   animate={{
                     boxShadow: [
-                      `0 0 ${40 + audioLevel * 40}px ${20 + audioLevel * 20}px rgba(218, 165, 32, ${0.15 + audioLevel * 0.15})`,
-                      `0 0 ${50 + audioLevel * 50}px ${25 + audioLevel * 25}px rgba(218, 165, 32, ${0.2 + audioLevel * 0.2})`,
-                      `0 0 ${40 + audioLevel * 40}px ${20 + audioLevel * 20}px rgba(218, 165, 32, ${0.15 + audioLevel * 0.15})`,
+                      `0 0 ${40 + audioLevel * 60}px ${20 + audioLevel * 30}px rgba(218, 165, 32, ${0.15 + audioLevel * 0.2})`,
+                      `0 0 ${60 + audioLevel * 80}px ${30 + audioLevel * 40}px rgba(218, 165, 32, ${0.25 + audioLevel * 0.3})`,
+                      `0 0 ${40 + audioLevel * 60}px ${20 + audioLevel * 30}px rgba(218, 165, 32, ${0.15 + audioLevel * 0.2})`,
                     ],
                   }}
                   transition={{ duration: 2, repeat: Infinity }}
                 />
 
-                <div className="relative w-40 h-40 md:w-56 md:h-56 rounded-full overflow-hidden border-2 border-amber-600/30">
+                <div className="relative w-48 h-48 md:w-64 md:h-64 rounded-full overflow-hidden border-2 border-amber-600/30">
                   {poem.hasDeityImage ? (
                     <Image src={poem.deityImageUrl} alt={poem.deity} fill className="object-cover" />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-amber-900/40 to-slate-900/60 flex items-center justify-center">
-                      <Image src="/icons/om.svg" alt="Om" width={80} height={80} className="opacity-50" />
+                      <Image src="/icons/om.svg" alt="Om" width={100} height={100} className="opacity-50" />
                     </div>
                   )}
                 </div>
               </motion.div>
 
               <motion.h1
-                className="font-serif text-2xl md:text-3xl text-amber-100 text-center mb-2"
+                className="font-serif text-3xl md:text-4xl text-amber-100 text-center mb-3"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.2 }}
-                style={{ textShadow: `0 0 ${20 + audioLevel * 20}px rgba(218, 165, 32, ${0.3 + audioLevel * 0.2})` }}
+                style={{ textShadow: `0 0 ${20 + audioLevel * 30}px rgba(218, 165, 32, ${0.4 + audioLevel * 0.3})` }}
               >
                 {poem.title}
               </motion.h1>
 
               <motion.p
-                className="font-serif text-amber-300/50 text-center mb-2"
+                className="font-serif text-xl text-amber-300/60 text-center mb-3"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3 }}
@@ -248,7 +251,7 @@ export default function PoemPlayerPage({ params }: PoemPlayerPageProps) {
               </motion.p>
 
               <motion.p
-                className="font-serif text-amber-400/30 text-sm text-center mb-8"
+                className="font-serif text-amber-400/40 text-sm text-center mb-10 tracking-widest uppercase"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
@@ -260,53 +263,59 @@ export default function PoemPlayerPage({ params }: PoemPlayerPageProps) {
                 <div className="w-full max-w-md">
                   <motion.button
                     onClick={toggle}
-                    className="mx-auto mb-6 flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-amber-800/40 to-amber-900/60 border border-amber-600/30"
+                    className="mx-auto mb-10 flex items-center justify-center w-24 h-24 rounded-full bg-gradient-to-br from-amber-800/50 to-amber-900/70 border border-amber-500/40 shadow-2xl"
                     whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    whileTap={{ scale: 0.92 }}
                     animate={{
                       boxShadow: isPlaying
-                        ? `0 0 ${30 + audioLevel * 30}px rgba(218, 165, 32, ${0.3 + audioLevel * 0.3})`
-                        : "0 0 20px rgba(218, 165, 32, 0.2)",
+                        ? `0 0 ${40 + audioLevel * 50}px rgba(218, 165, 32, ${0.4 + audioLevel * 0.4})`
+                        : "0 0 25px rgba(218, 165, 32, 0.2)",
                     }}
                   >
                     {isPlaying ? (
-                      <svg className="w-8 h-8 text-amber-200" fill="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-10 h-10 text-amber-100" fill="currentColor" viewBox="0 0 24 24">
                         <rect x="6" y="4" width="4" height="16" rx="1" />
                         <rect x="14" y="4" width="4" height="16" rx="1" />
                       </svg>
                     ) : (
-                      <svg className="w-8 h-8 text-amber-200 ml-1" fill="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-10 h-10 text-amber-100 ml-1" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M8 5v14l11-7z" />
                       </svg>
                     )}
                   </motion.button>
 
                   <div
-                    className="relative h-2 bg-amber-900/30 rounded-full cursor-pointer overflow-hidden"
-                    onClick={handleSeek}
+                    ref={seekRef}
+                    className="relative h-4 bg-amber-950/40 rounded-full cursor-pointer mb-2 touch-none"
+                    onMouseDown={handleSeek}
+                    onTouchStart={handleSeek}
                   >
                     <motion.div
-                      className="absolute inset-y-0 left-0 bg-gradient-to-r from-amber-600/60 to-amber-500/80 rounded-full"
+                      className="absolute inset-y-0 left-0 bg-gradient-to-r from-amber-600 to-amber-400 rounded-full"
                       style={{ width: `${(currentTime / duration) * 100 || 0}%` }}
                       animate={{
-                        boxShadow: isPlaying ? `0 0 ${10 + audioLevel * 10}px rgba(218, 165, 32, 0.5)` : "none",
+                        boxShadow: isPlaying ? `0 0 ${15 + audioLevel * 15}px rgba(218, 165, 32, 0.6)` : "none",
                       }}
+                    />
+                    <motion.div 
+                      className="absolute top-1/2 -translate-y-1/2 w-6 h-6 bg-amber-100 rounded-full border-2 border-amber-600 shadow-lg"
+                      style={{ left: `calc(${(currentTime / duration) * 100 || 0}% - 12px)` }}
                     />
                   </div>
 
-                  <div className="flex justify-between mt-2 text-xs text-amber-400/40 font-serif">
+                  <div className="flex justify-between text-sm text-amber-400/60 font-serif tracking-widest">
                     <span>{formatTime(currentTime)}</span>
                     <span>{formatTime(duration) || poem.duration}</span>
                   </div>
                 </div>
               ) : (
                 <motion.div
-                  className="text-center"
+                  className="text-center py-10"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                 >
-                  <p className="font-serif text-amber-300/40 mb-2">Audio preparing with devotion</p>
-                  <p className="font-serif text-amber-500/30 text-sm">The sacred recording will arrive soon</p>
+                  <p className="font-serif text-amber-300/40 mb-2 italic">Audio preparing with devotion</p>
+                  <p className="font-serif text-amber-500/30 text-xs tracking-widest uppercase">Arrival imminent</p>
                 </motion.div>
               )}
             </main>
@@ -315,14 +324,27 @@ export default function PoemPlayerPage({ params }: PoemPlayerPageProps) {
       </AnimatePresence>
 
       {sacredMode && (
-        <motion.p
-          className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 font-serif text-amber-400/20 text-xs"
+        <motion.div 
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center p-6 text-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 2 }}
+          transition={{ delay: 0.5 }}
         >
-          Tap anywhere or press ESC to exit
-        </motion.p>
+          <motion.div
+            className="mb-8"
+            animate={{ scale: 1 + audioLevel * 0.1 }}
+          >
+            <Image src="/icons/lotus.svg" alt="Lotus" width={120} height={120} className="opacity-20" />
+          </motion.div>
+          <motion.p
+            className="font-serif text-amber-400/20 text-sm tracking-[0.2em] uppercase"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 2 }}
+          >
+            Tap to exit Sacred Mode
+          </motion.p>
+        </motion.div>
       )}
     </div>
   );
