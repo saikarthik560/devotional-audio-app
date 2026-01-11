@@ -77,7 +77,7 @@ export function PoemClient({ poem }: PoemClientProps) {
 
   return (
     <div
-      className="relative min-h-screen bg-[#0a0a14] overflow-hidden touch-none"
+      className="relative min-h-screen bg-[#0a0a14] overflow-x-hidden"
       onClick={() => sacredMode && setSacredMode(false)}
     >
       <LayeredBackground backgroundImage={poem.hasBackground ? poem.backgroundUrl : undefined} intensity={1.2 + audioLevel * 0.5} />

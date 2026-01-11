@@ -50,7 +50,7 @@ export function Diya({ size = 120, glowIntensity = 1, audioLevel = 0 }: DiyaProp
 
   return (
     <motion.div
-      className="relative cursor-pointer touch-none"
+      className="relative cursor-pointer"
       style={{ width: size, height: size, willChange: "transform" }}
       whileTap={{ scale: 0.95 }}
       onTap={handleTouch}

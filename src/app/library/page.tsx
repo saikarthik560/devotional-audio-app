@@ -49,7 +49,7 @@ export default function LibraryPage() {
       <GlowLayer intensity={0.8} color="gold" />
       <ParticleSystem count={10} layer="foreground" interactive />
 
-      <div className="relative z-20 min-h-screen px-4 py-8 md:px-8">
+      <div className="relative z-40 min-h-screen px-4 py-8 md:px-8">
         <motion.header
           className="max-w-5xl mx-auto mb-12"
           initial={{ opacity: 0, y: -20 }}
@@ -190,9 +190,8 @@ export default function LibraryPage() {
           ) : (
             <motion.div
               className="grid gap-6 md:grid-cols-2"
-              layout
             >
-              <AnimatePresence mode="popLayout">
+              <AnimatePresence>
                 {filteredPoems.map((poem, index) => (
                   <SacredCard key={poem.id} poem={poem} index={index} />
                 ))}

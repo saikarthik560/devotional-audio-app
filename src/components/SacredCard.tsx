@@ -12,7 +12,7 @@ interface SacredCardProps {
 
 export function SacredCard({ poem, index }: SacredCardProps) {
   return (
-    <Link href={`/poem/${poem.id}`} className="touch-none">
+    <Link href={`/poem/${poem.id}`}>
       <motion.div
         className="relative group cursor-pointer active:scale-95 transition-transform duration-300 will-change-transform"
         initial={{ opacity: 0, y: 30, rotateX: 15 }}
@@ -34,7 +34,7 @@ export function SacredCard({ poem, index }: SacredCardProps) {
           transformStyle: "preserve-3d",
         }}
       >
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-200 via-amber-100 to-amber-50 border-2 border-amber-500 shadow-2xl shadow-black/40">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-300 via-amber-200 to-amber-100 border-2 border-amber-500 shadow-2xl shadow-black/60">
           <motion.div
             className="absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent"
             animate={{
