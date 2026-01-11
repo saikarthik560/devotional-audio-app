@@ -34,24 +34,24 @@ export function SacredCard({ poem, index }: SacredCardProps) {
           transformStyle: "preserve-3d",
         }}
       >
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-800/80 via-slate-700/90 to-slate-800/95 border border-amber-500/60 backdrop-blur-md shadow-lg shadow-black/40">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-100 via-amber-50 to-white border-2 border-amber-400/60 shadow-xl shadow-black/20">
           <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-400/20 to-transparent"
+            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent"
             animate={{
               x: ["-200%", "200%"],
             }}
             transition={{
-              duration: 4,
+              duration: 3,
               repeat: Infinity,
-              repeatDelay: 3,
+              repeatDelay: 4,
               ease: "easeInOut",
             }}
           />
 
           <motion.div
-            className="absolute inset-0 opacity-40 group-hover:opacity-100 transition-opacity duration-700"
+            className="absolute inset-0 opacity-20 group-hover:opacity-40 transition-opacity duration-700"
             style={{
-              background: "radial-gradient(circle at 50% 50%, rgba(218, 165, 32, 0.25) 0%, transparent 60%)",
+              background: "radial-gradient(circle at 50% 50%, rgba(218, 165, 32, 0.4) 0%, transparent 60%)",
             }}
           />
 
@@ -62,13 +62,13 @@ export function SacredCard({ poem, index }: SacredCardProps) {
                   className="absolute inset-0 rounded-full"
                   animate={{
                     boxShadow: [
-                      "0 0 25px rgba(218, 165, 32, 0.3)",
-                      "0 0 50px rgba(218, 165, 32, 0.5)",
-                      "0 0 25px rgba(218, 165, 32, 0.3)",
+                      "0 0 15px rgba(218, 165, 32, 0.4)",
+                      "0 0 30px rgba(218, 165, 32, 0.6)",
+                      "0 0 15px rgba(218, 165, 32, 0.4)",
                     ],
                   }}
                   transition={{
-                    duration: 3,
+                    duration: 2,
                     repeat: Infinity,
                     ease: "easeInOut",
                   }}
@@ -79,16 +79,16 @@ export function SacredCard({ poem, index }: SacredCardProps) {
                     src={poem.deityImageUrl}
                     alt={poem.deity}
                     fill
-                    className="object-cover rounded-full border-2 border-amber-400/40"
+                    className="object-cover rounded-full border-2 border-amber-600/40"
                   />
                 ) : (
-                  <div className="w-full h-full rounded-full bg-gradient-to-br from-amber-500/40 to-amber-800/40 flex items-center justify-center border-2 border-amber-400/40">
+                  <div className="w-full h-full rounded-full bg-gradient-to-br from-amber-200 to-amber-100 flex items-center justify-center border-2 border-amber-600/40">
                     <Image
                       src="/icons/om.svg"
                       alt="Om"
                       width={48}
                       height={48}
-                      className="opacity-80"
+                      className="opacity-90 grayscale contrast-125"
                     />
                   </div>
                 )}
@@ -96,7 +96,7 @@ export function SacredCard({ poem, index }: SacredCardProps) {
 
               <div className="flex-1 min-w-0">
                 <motion.h3
-                  className="font-serif text-2xl text-amber-50 mb-1 truncate tracking-wide"
+                  className="font-serif text-2xl text-amber-950 mb-1 truncate tracking-wide"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: index * 0.1 + 0.2 }}
@@ -104,32 +104,32 @@ export function SacredCard({ poem, index }: SacredCardProps) {
                   {poem.title}
                 </motion.h3>
                 
-                  <p className="text-amber-100/90 text-sm mb-3 font-serif font-medium">
+                  <p className="text-amber-900/80 text-sm mb-3 font-serif font-medium">
                     {poem.deity} • {poem.mood}
                   </p>
 
-                  <div className="flex items-center gap-3 text-[10px] uppercase tracking-widest text-amber-200/80 font-sans font-semibold">
+                  <div className="flex items-center gap-3 text-[10px] uppercase tracking-widest text-amber-800/70 font-sans font-bold">
                     <span>{poem.language}</span>
-                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400/60" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-600/40" />
                     <span>{poem.duration}</span>
-                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400/60" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-600/40" />
                     <span>{poem.recorded_year}</span>
                   </div>
                 </div>
               </div>
 
               <motion.div
-                className="mt-6 pt-4 border-t border-amber-500/50 flex items-center justify-between"
+                className="mt-6 pt-4 border-t border-amber-200/60 flex items-center justify-between"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: index * 0.1 + 0.3 }}
               >
-                <span className="text-amber-50/90 text-xs font-serif italic font-medium">
+                <span className="text-amber-900/60 text-xs font-serif italic font-semibold">
                   Sung by {poem.recorded_by}
                 </span>
               
               <motion.div
-                className="flex items-center gap-2 text-amber-300 font-serif font-medium"
+                className="flex items-center gap-2 text-amber-700 font-serif font-bold"
                 whileHover={{ x: 3 }}
               >
                 {poem.hasAudio ? (
@@ -140,7 +140,7 @@ export function SacredCard({ poem, index }: SacredCardProps) {
                     </svg>
                   </>
                 ) : (
-                  <span className="text-amber-400/60">Preparing...</span>
+                  <span className="text-amber-600/40 font-bold">Preparing...</span>
                 )}
               </motion.div>
             </motion.div>

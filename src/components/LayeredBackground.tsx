@@ -18,24 +18,36 @@ export function LayeredBackground({
   const containerRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
 
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    if (isMobile) return;
-    const x = e.clientX / window.innerWidth;
-    const y = e.clientY / window.innerHeight;
-    
-    if (containerRef.current) {
-      containerRef.current.style.setProperty("--mouse-x", `${x * 100}%`);
-      containerRef.current.style.setProperty("--mouse-y", `${y * 100}%`);
-      containerRef.current.style.setProperty("--offset-x", `${(x - 0.5) * -20 * intensity}px`);
-      containerRef.current.style.setProperty("--offset-y", `${(y - 0.5) * -20 * intensity}px`);
-    }
-  }, [isMobile, intensity]);
+    const handleInteraction = useCallback((clientX: number, clientY: number) => {
+      const x = clientX / window.innerWidth;
+      const y = clientY / window.innerHeight;
+      
+      if (containerRef.current) {
+        containerRef.current.style.setProperty("--mouse-x", `${x * 100}%`);
+        containerRef.current.style.setProperty("--mouse-y", `${y * 100}%`);
+        containerRef.current.style.setProperty("--offset-x", `${(x - 0.5) * -20 * intensity}px`);
+        containerRef.current.style.setProperty("--offset-y", `${(y - 0.5) * -20 * intensity}px`);
+      }
+    }, [intensity]);
 
-  useEffect(() => {
-    if (isMobile) return;
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, [handleMouseMove, isMobile]);
+    const handleMouseMove = useCallback((e: MouseEvent) => {
+      handleInteraction(e.clientX, e.clientY);
+    }, [handleInteraction]);
+
+    const handleTouchMove = useCallback((e: TouchEvent) => {
+      if (e.touches[0]) {
+        handleInteraction(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    }, [handleInteraction]);
+
+    useEffect(() => {
+      window.addEventListener("mousemove", handleMouseMove, { passive: true });
+      window.addEventListener("touchmove", handleTouchMove, { passive: true });
+      return () => {
+        window.removeEventListener("mousemove", handleMouseMove);
+        window.removeEventListener("touchmove", handleTouchMove);
+      };
+    }, [handleMouseMove, handleTouchMove]);
 
   return (
     <div 

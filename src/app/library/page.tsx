@@ -190,7 +190,7 @@ export default function LibraryPage() {
           ) : (
             <motion.div
               className="grid gap-6 md:grid-cols-2"
-              style={{ perspective: "1200px" }}
+              layout
             >
               <AnimatePresence mode="popLayout">
                 {filteredPoems.map((poem, index) => (
