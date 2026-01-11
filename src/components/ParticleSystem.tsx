@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform, type MotionValue } from "framer-motion";
 import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
 
@@ -36,31 +36,34 @@ export function ParticleSystem({
   const [particles, setParticles] = useState<Particle[]>([]);
   const mouseX = useMotionValue(0.5);
   const mouseY = useMotionValue(0.5);
-  
+
   const springX = useSpring(mouseX, { stiffness: 30, damping: 20 });
   const springY = useSpring(mouseY, { stiffness: 30, damping: 20 });
 
   useEffect(() => {
     setMounted(true);
-    const newParticles = Array.from({ length: count }, (_, i) => ({
+    const newParticles = Array.from({ length: count }, (_, i): Particle => ({
       id: i,
       icon: icons[i % icons.length],
       initialX: Math.random() * 100,
       initialY: Math.random() * 100,
       size: layer === "foreground" ? 20 + Math.random() * 20 : 10 + Math.random() * 15,
-      delay: Math.random() * 30, // Increased delay for better spreading in time
+      delay: Math.random() * 30,
       duration: layer === "foreground" ? 20 + Math.random() * 15 : 30 + Math.random() * 20,
       opacity: layer === "foreground" ? 0.3 + Math.random() * 0.4 : 0.1 + Math.random() * 0.2,
     }));
     setParticles(newParticles);
   }, [count, icons, layer]);
 
-  const handleMouseMove = useCallback((e: MouseEvent | TouchEvent) => {
-    const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
-    const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
-    mouseX.set(clientX / window.innerWidth);
-    mouseY.set(clientY / window.innerHeight);
-  }, [mouseX, mouseY]);
+  const handleMouseMove = useCallback(
+    (e: MouseEvent | TouchEvent) => {
+      const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
+      const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
+      mouseX.set(clientX / window.innerWidth);
+      mouseY.set(clientY / window.innerHeight);
+    },
+    [mouseX, mouseY]
+  );
 
   useEffect(() => {
     if (!interactive) return;
@@ -96,8 +99,8 @@ export function ParticleSystem({
 
 interface ParticleItemProps {
   particle: Particle;
-  springX: any;
-  springY: any;
+  springX: MotionValue<number>;
+  springY: MotionValue<number>;
   audioIntensity: number;
   interactive: boolean;
   layer: "foreground" | "background";
@@ -112,8 +115,7 @@ function ParticleItem({
   layer,
 }: ParticleItemProps) {
   const influence = layer === "foreground" ? 100 : 50;
-  
-  // Interaction offsets (parallax effect)
+
   const tx = useTransform(springX, [0, 1], [influence, -influence]);
   const ty = useTransform(springY, [0, 1], [influence, -influence]);
 
@@ -168,13 +170,7 @@ function ParticleItem({
           filter: `drop-shadow(0 0 ${4 + glowIntensity * 8}px rgba(255, 200, 100, ${0.3 + glowIntensity}))`,
         }}
       >
-        <Image
-          src={particle.icon}
-          alt=""
-          fill
-          className="object-contain"
-          style={{ opacity: 0.8 }}
-        />
+        <Image src={particle.icon} alt="" fill className="object-contain" style={{ opacity: 0.8 }} />
       </div>
     </motion.div>
   );
