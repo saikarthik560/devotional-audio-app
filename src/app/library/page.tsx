@@ -87,23 +87,23 @@ export default function LibraryPage() {
             Sacred Library
           </motion.h1>
           
-          <motion.p
-            className="font-serif text-amber-300/50 text-center mb-8"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
-          >
-            Devotional poetry sung with love
-          </motion.p>
+            <motion.p
+              className="font-serif text-amber-200/70 text-center mb-8"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+            >
+              Devotional poetry sung with love
+            </motion.p>
 
-          <motion.div
-            className="flex flex-wrap justify-center gap-4"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-          >
-            <div className="flex items-center gap-2">
-              <span className="text-amber-400/40 text-xs font-serif">Deity:</span>
+            <motion.div
+              className="flex flex-wrap justify-center gap-4"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+            >
+              <div className="flex items-center gap-2">
+                <span className="text-amber-400/60 text-xs font-serif">Deity:</span>
               <select
                 value={selectedDeity}
                 onChange={(e) => setSelectedDeity(e.target.value)}

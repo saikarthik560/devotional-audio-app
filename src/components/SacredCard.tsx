@@ -34,7 +34,7 @@ export function SacredCard({ poem, index }: SacredCardProps) {
           transformStyle: "preserve-3d",
         }}
       >
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-950/40 via-slate-900/60 to-slate-950/80 border border-amber-800/20 backdrop-blur-md">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-900/60 via-slate-800/70 to-slate-900/90 border border-amber-600/40 backdrop-blur-md">
           <motion.div
             className="absolute inset-0 bg-gradient-to-r from-transparent via-amber-500/10 to-transparent"
             animate={{
@@ -104,29 +104,29 @@ export function SacredCard({ poem, index }: SacredCardProps) {
                   {poem.title}
                 </motion.h3>
                 
-                <p className="text-amber-300/70 text-sm mb-3 font-serif">
-                  {poem.deity} • {poem.mood}
-                </p>
+                  <p className="text-amber-200/90 text-sm mb-3 font-serif">
+                    {poem.deity} • {poem.mood}
+                  </p>
 
-                <div className="flex items-center gap-3 text-[10px] uppercase tracking-widest text-amber-200/40 font-sans font-medium">
-                  <span>{poem.language}</span>
-                  <span className="w-1 h-1 rounded-full bg-amber-500/30" />
-                  <span>{poem.duration}</span>
-                  <span className="w-1 h-1 rounded-full bg-amber-500/30" />
-                  <span>{poem.recorded_year}</span>
+                  <div className="flex items-center gap-3 text-[10px] uppercase tracking-widest text-amber-200/60 font-sans font-medium">
+                    <span>{poem.language}</span>
+                    <span className="w-1 h-1 rounded-full bg-amber-500/50" />
+                    <span>{poem.duration}</span>
+                    <span className="w-1 h-1 rounded-full bg-amber-500/50" />
+                    <span>{poem.recorded_year}</span>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <motion.div
-              className="mt-6 pt-4 border-t border-amber-800/20 flex items-center justify-between"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: index * 0.1 + 0.3 }}
-            >
-              <span className="text-amber-200/50 text-xs font-serif italic">
-                Sung by {poem.recorded_by}
-              </span>
+              <motion.div
+                className="mt-6 pt-4 border-t border-amber-600/40 flex items-center justify-between"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: index * 0.1 + 0.3 }}
+              >
+                <span className="text-amber-100/80 text-xs font-serif italic">
+                  Sung by {poem.recorded_by}
+                </span>
               
               <motion.div
                 className="flex items-center gap-2 text-amber-400/80 text-sm font-serif"
