@@ -1,18 +1,12 @@
-import { getAllPoems } from "@/lib/poems";
+import poems from "@/data/poems.json";
 import PoemPlayerClient from "./PoemPlayerClient";
 
-export async function generateStaticParams() {
-  const poems = await getAllPoems();
-  return poems.map((p) => ({
+export function generateStaticParams() {
+  return poems.map((p: { id: string | number }) => ({
     id: p.id.toString(),
   }));
 }
 
-export default async function Page({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
-  return <PoemPlayerClient id={id} />;
+export default function Page({ params }: { params: { id: string } }) {
+  return <PoemPlayerClient id={params.id} />;
 }
