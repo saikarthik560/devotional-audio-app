@@ -18,8 +18,10 @@ export default function LibraryPage() {
   const [selectedMood, setSelectedMood] = useState<string>("all");
   const [deities, setDeities] = useState<string[]>([]);
   const [moods, setMoods] = useState<string[]>([]);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     async function loadPoems() {
       const loadedPoems = await getAllPoems();
       setPoems(loadedPoems);
@@ -32,6 +34,7 @@ export default function LibraryPage() {
   }, []);
 
   useEffect(() => {
+    if (!mounted) return;
     let filtered = poems;
     if (selectedDeity !== "all") {
       filtered = filtered.filter((p) => p.deity === selectedDeity);
@@ -40,10 +43,14 @@ export default function LibraryPage() {
       filtered = filtered.filter((p) => p.mood === selectedMood);
     }
     setFilteredPoems(filtered);
-  }, [selectedDeity, selectedMood, poems]);
+  }, [selectedDeity, selectedMood, poems, mounted]);
+
+  if (!mounted) {
+    return <div className="min-h-screen bg-[#0a0a14]" />;
+  }
 
   return (
-    <div className="relative min-h-screen overflow-x-hidden bg-[#0a0a14]">
+    <div className="relative min-h-screen overflow-x-hidden bg-[#0a0a14] selection:bg-amber-500/30">
       <LayeredBackground intensity={1} />
       <ParticleSystem count={15} layer="background" interactive />
       <GlowLayer intensity={0.8} color="gold" />
