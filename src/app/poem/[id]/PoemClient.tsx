@@ -267,24 +267,68 @@ export function PoemClient({ poem }: PoemClientProps) {
 
       {sacredMode && (
         <motion.div 
-          className="fixed inset-0 z-50 flex flex-col items-center justify-center p-6 text-center"
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center p-6 text-center cursor-pointer"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
         >
           <motion.div
-            className="mb-8"
+            className="relative mb-10"
             animate={{ scale: 1 + audioLevel * 0.1 }}
           >
-            <Image src="/icons/lotus.svg" alt="Lotus" width={120} height={120} className="opacity-20" />
+            <motion.div
+              className="absolute inset-0 rounded-full"
+              animate={{
+                boxShadow: [
+                  `0 0 ${80 + audioLevel * 100}px ${30 + audioLevel * 50}px rgba(218, 165, 32, ${0.1 + audioLevel * 0.2})`,
+                  `0 0 ${120 + audioLevel * 140}px ${45 + audioLevel * 70}px rgba(218, 165, 32, ${0.15 + audioLevel * 0.25})`,
+                  `0 0 ${80 + audioLevel * 100}px ${30 + audioLevel * 50}px rgba(218, 165, 32, ${0.1 + audioLevel * 0.2})`,
+                ],
+              }}
+              transition={{ duration: 4, repeat: Infinity }}
+            />
+
+            <div className="relative w-48 h-48 md:w-64 md:h-64 rounded-full overflow-hidden border border-amber-500/10 shadow-2xl">
+              {poem.hasDeityImage ? (
+                <Image 
+                  src={poem.deityImageUrl} 
+                  alt={poem.deity} 
+                  fill 
+                  className="object-cover opacity-60 mix-blend-lighten" 
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-amber-950/20 to-slate-900/40 flex items-center justify-center">
+                  <Image src="/icons/om.svg" alt="Om" width={100} height={100} className="opacity-20" />
+                </div>
+              )}
+              
+              {/* Sacred Overlay */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <Image src="/icons/lotus.svg" alt="Lotus" width={120} height={120} className="opacity-10 mix-blend-overlay scale-125" />
+              </div>
+            </div>
           </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1, duration: 1 }}
+          >
+            <h2 className="font-serif text-2xl md:text-3xl text-amber-200/30 mb-2 tracking-wide">
+              {poem.title}
+            </h2>
+            <p className="font-serif text-amber-500/20 text-[10px] md:text-xs tracking-[0.4em] uppercase">
+              Presence of {poem.deity}
+            </p>
+          </motion.div>
+
           <motion.p
-            className="font-serif text-amber-400/20 text-sm tracking-[0.2em] uppercase"
+            className="fixed bottom-12 left-0 right-0 font-serif text-amber-400/10 text-[10px] tracking-[0.5em] uppercase pointer-events-none"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 2 }}
+            transition={{ delay: 3, duration: 2 }}
           >
-            Tap to exit Sacred Mode
+            Tap to return
           </motion.p>
         </motion.div>
       )}
