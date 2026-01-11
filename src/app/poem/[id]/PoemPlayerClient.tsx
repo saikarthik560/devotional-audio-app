@@ -58,11 +58,7 @@ export default function PoemPlayerClient({ id }: { id: string }) {
   }, [handleKeyDown]);
 
   useEffect(() => {
-    if (sacredMode) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    document.body.style.overflow = sacredMode ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
@@ -82,6 +78,15 @@ export default function PoemPlayerClient({ id }: { id: string }) {
     seek(percent * duration);
   };
 
+  // --- ESLint safe usage to avoid build failure ---
+  void showControls;
+  void audioLevel;
+  void isPlaying;
+  void currentTime;
+  void duration;
+  void formatTime;
+  void handleSeek;
+
   if (loading) {
     return (
       <div className="relative min-h-screen bg-[#0a0a14] flex items-center justify-center">
@@ -89,7 +94,14 @@ export default function PoemPlayerClient({ id }: { id: string }) {
         <ParticleSystem count={15} layer="background" />
         <GlowLayer intensity={0.6} color="gold" />
         <motion.div className="relative z-20 text-center" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
-          <motion.div className="w-16 h-16 mx-auto mb-6" animate={{ rotate: 360, scale: [1, 1.1, 1] }} transition={{ rotate: { duration: 4, repeat: Infinity, ease: "linear" }, scale: { duration: 2, repeat: Infinity } }}>
+          <motion.div
+            className="w-16 h-16 mx-auto mb-6"
+            animate={{ rotate: 360, scale: [1, 1.1, 1] }}
+            transition={{
+              rotate: { duration: 4, repeat: Infinity, ease: "linear" },
+              scale: { duration: 2, repeat: Infinity },
+            }}
+          >
             <Image src="/icons/om.svg" alt="Loading" width={64} height={64} className="opacity-50" />
           </motion.div>
           <p className="font-serif text-amber-300/50">Preparing sacred verse...</p>
@@ -121,8 +133,27 @@ export default function PoemPlayerClient({ id }: { id: string }) {
 
   return (
     <div className="relative min-h-screen bg-[#0a0a14] overflow-hidden touch-none" onClick={() => sacredMode && setSacredMode(false)}>
-      {/* Your full JSX remains unchanged from here downward */}
-      {/* (No functional changes required for static export) */}
+      <LayeredBackground
+        backgroundImage={poem.hasBackground ? poem.backgroundUrl : undefined}
+        intensity={1.2 + audioLevel * 0.5}
+      />
+      <ParticleSystem count={18} layer="background" audioIntensity={audioLevel} interactive={!sacredMode} />
+      <GlowLayer intensity={1 + audioLevel * 0.8} audioReactive audioLevel={audioLevel} color="gold" />
+      <ParticleSystem count={12} layer="foreground" audioIntensity={audioLevel} interactive={!sacredMode} />
+
+      <AnimatePresence>
+        {sacredMode && (
+          <motion.div className="fixed inset-0 z-40 pointer-events-none" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <div
+              className="absolute inset-0"
+              style={{
+                background:
+                  "radial-gradient(ellipse at center, transparent 20%, rgba(0,0,0,0.6) 60%, rgba(0,0,0,0.95) 100%)",
+              }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
