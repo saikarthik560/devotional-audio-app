@@ -88,7 +88,7 @@ export default function LibraryPage() {
           </motion.h1>
           
             <motion.p
-              className="font-serif text-amber-200/70 text-center mb-8"
+              className="font-serif text-amber-100/90 text-center mb-8"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.8, delay: 0.4 }}
@@ -103,11 +103,11 @@ export default function LibraryPage() {
               transition={{ duration: 0.6, delay: 0.5 }}
             >
               <div className="flex items-center gap-2">
-                <span className="text-amber-400/60 text-xs font-serif">Deity:</span>
+                <span className="text-amber-200/80 text-xs font-serif font-medium">Deity:</span>
               <select
                 value={selectedDeity}
                 onChange={(e) => setSelectedDeity(e.target.value)}
-                className="bg-amber-900/20 border border-amber-600/20 rounded-lg px-3 py-1.5 text-sm text-amber-200 focus:outline-none focus:border-amber-500/40 font-serif"
+                className="bg-amber-900/40 border border-amber-500/40 rounded-lg px-3 py-1.5 text-sm text-amber-50 focus:outline-none focus:border-amber-400/60 font-serif"
               >
                 <option value="all">All Deities</option>
                 {deities.map((deity) => (
@@ -117,11 +117,11 @@ export default function LibraryPage() {
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-amber-400/40 text-xs font-serif">Mood:</span>
+              <span className="text-amber-200/80 text-xs font-serif font-medium">Mood:</span>
               <select
                 value={selectedMood}
                 onChange={(e) => setSelectedMood(e.target.value)}
-                className="bg-amber-900/20 border border-amber-600/20 rounded-lg px-3 py-1.5 text-sm text-amber-200 focus:outline-none focus:border-amber-500/40 font-serif"
+                className="bg-amber-900/40 border border-amber-500/40 rounded-lg px-3 py-1.5 text-sm text-amber-50 focus:outline-none focus:border-amber-400/60 font-serif"
               >
                 <option value="all">All Moods</option>
                 {moods.map((mood) => (
