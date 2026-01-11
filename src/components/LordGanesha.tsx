@@ -2,16 +2,20 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { useIsMobile } from "@/hooks/useMediaQuery";
 
 interface LordGaneshaProps {
   size?: number;
 }
 
 export function LordGanesha({ size = 400 }: LordGaneshaProps) {
+  const isMobile = useIsMobile();
+  const rayCount = isMobile ? 4 : 8;
+
   return (
     <motion.div
       className="relative flex items-center justify-center"
-      style={{ width: size, height: size }}
+      style={{ width: size, height: size, willChange: "transform, opacity" }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 2, ease: "easeOut" }}
@@ -28,6 +32,7 @@ export function LordGanesha({ size = 400 }: LordGaneshaProps) {
           repeat: Infinity,
           ease: "easeInOut",
         }}
+        style={{ willChange: "transform, opacity" }}
       />
       
       <div className="relative w-full h-full flex items-center justify-center">
@@ -35,18 +40,21 @@ export function LordGanesha({ size = 400 }: LordGaneshaProps) {
           src="https://pngimg.com/uploads/ganesha/ganesha_PNG34.png"
           alt="Lord Ganesha"
           fill
-          className="object-contain drop-shadow-[0_0_30px_rgba(255,191,0,0.3)]"
+          className="object-contain"
+          style={{
+            filter: isMobile ? "none" : "drop-shadow(0 0 30px rgba(255,191,0,0.3))",
+          }}
           priority
         />
       </div>
 
       {/* Additional subtle spiritual rays */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {[...Array(8)].map((_, i) => (
+        {[...Array(rayCount)].map((_, i) => (
           <motion.div
             key={i}
             className="absolute top-1/2 left-1/2 w-[200%] h-[1px] bg-gradient-to-r from-transparent via-amber-500/5 to-transparent origin-center"
-            style={{ rotate: `${i * 45}deg` }}
+            style={{ rotate: `${i * (360 / rayCount)}deg`, willChange: "transform, opacity" }}
             animate={{
               opacity: [0, 0.5, 0],
               scaleX: [0.8, 1.2, 0.8],
@@ -63,3 +71,4 @@ export function LordGanesha({ size = 400 }: LordGaneshaProps) {
     </motion.div>
   );
 }
+

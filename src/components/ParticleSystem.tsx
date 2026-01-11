@@ -1,8 +1,9 @@
 "use client";
 
-import { motion, useMotionValue, useSpring, useTransform, type MotionValue } from "framer-motion";
-import { useEffect, useState, useCallback } from "react";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import Image from "next/image";
+import { useIsMobile } from "@/hooks/useMediaQuery";
 
 interface Particle {
   id: number;
@@ -26,23 +27,31 @@ interface ParticleSystemProps {
 const DEFAULT_ICONS = ["/icons/lotus.svg", "/icons/om.svg", "/icons/star.svg", "/icons/bell.svg"];
 
 export function ParticleSystem({
-  count = 15,
+  count: propCount,
   icons = DEFAULT_ICONS,
   audioIntensity = 0,
   interactive = true,
   layer = "foreground",
 }: ParticleSystemProps) {
   const [mounted, setMounted] = useState(false);
+  const isMobile = useIsMobile();
+  
+  // Reduce count on mobile
+  const count = useMemo(() => {
+    const baseCount = propCount || (layer === "foreground" ? 15 : 20);
+    return isMobile ? Math.floor(baseCount * 0.4) : baseCount;
+  }, [propCount, isMobile, layer]);
+
   const [particles, setParticles] = useState<Particle[]>([]);
   const mouseX = useMotionValue(0.5);
   const mouseY = useMotionValue(0.5);
-
+  
   const springX = useSpring(mouseX, { stiffness: 30, damping: 20 });
   const springY = useSpring(mouseY, { stiffness: 30, damping: 20 });
 
   useEffect(() => {
     setMounted(true);
-    const newParticles = Array.from({ length: count }, (_, i): Particle => ({
+    const newParticles = Array.from({ length: count }, (_, i) => ({
       id: i,
       icon: icons[i % icons.length],
       initialX: Math.random() * 100,
@@ -55,25 +64,19 @@ export function ParticleSystem({
     setParticles(newParticles);
   }, [count, icons, layer]);
 
-  const handleMouseMove = useCallback(
-    (e: MouseEvent | TouchEvent) => {
-      const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
-      const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
-      mouseX.set(clientX / window.innerWidth);
-      mouseY.set(clientY / window.innerHeight);
-    },
-    [mouseX, mouseY]
-  );
+  const handleMouseMove = useCallback((e: MouseEvent | TouchEvent) => {
+    if (isMobile) return; // Disable parallax on mobile for performance
+    const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
+    const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
+    mouseX.set(clientX / window.innerWidth);
+    mouseY.set(clientY / window.innerHeight);
+  }, [mouseX, mouseY, isMobile]);
 
   useEffect(() => {
-    if (!interactive) return;
+    if (!interactive || isMobile) return;
     window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("touchmove", handleMouseMove);
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("touchmove", handleMouseMove);
-    };
-  }, [handleMouseMove, interactive]);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, [handleMouseMove, interactive, isMobile]);
 
   if (!mounted) return null;
 
@@ -89,8 +92,9 @@ export function ParticleSystem({
           springX={springX}
           springY={springY}
           audioIntensity={audioIntensity}
-          interactive={interactive}
+          interactive={interactive && !isMobile}
           layer={layer}
+          isMobile={isMobile}
         />
       ))}
     </div>
@@ -99,11 +103,12 @@ export function ParticleSystem({
 
 interface ParticleItemProps {
   particle: Particle;
-  springX: MotionValue<number>;
-  springY: MotionValue<number>;
+  springX: any;
+  springY: any;
   audioIntensity: number;
   interactive: boolean;
   layer: "foreground" | "background";
+  isMobile: boolean;
 }
 
 function ParticleItem({
@@ -113,9 +118,10 @@ function ParticleItem({
   audioIntensity,
   interactive,
   layer,
+  isMobile,
 }: ParticleItemProps) {
   const influence = layer === "foreground" ? 100 : 50;
-
+  
   const tx = useTransform(springX, [0, 1], [influence, -influence]);
   const ty = useTransform(springY, [0, 1], [influence, -influence]);
 
@@ -131,12 +137,13 @@ function ParticleItem({
         y: interactive ? ty : 0,
         width: particle.size,
         height: particle.size,
+        willChange: "transform, opacity",
       }}
       initial={{ opacity: 0, top: "-10vh" }}
       animate={{
         opacity: [0, particle.opacity, particle.opacity, 0],
         top: ["-10vh", "110vh"],
-        rotate: [0, 360],
+        rotate: isMobile ? 0 : [0, 360], // Disable rotation on mobile
         scale: [scaleBase, scaleBase * 1.1, scaleBase],
       }}
       transition={{
@@ -167,10 +174,17 @@ function ParticleItem({
       <div
         className="relative w-full h-full"
         style={{
-          filter: `drop-shadow(0 0 ${4 + glowIntensity * 8}px rgba(255, 200, 100, ${0.3 + glowIntensity}))`,
+          // Disable expensive filter on mobile
+          filter: isMobile ? "none" : `drop-shadow(0 0 ${4 + glowIntensity * 8}px rgba(255, 200, 100, ${0.3 + glowIntensity}))`,
         }}
       >
-        <Image src={particle.icon} alt="" fill className="object-contain" style={{ opacity: 0.8 }} />
+        <Image
+          src={particle.icon}
+          alt=""
+          fill
+          className="object-contain"
+          style={{ opacity: 0.8 }}
+        />
       </div>
     </motion.div>
   );

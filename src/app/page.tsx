@@ -49,7 +49,7 @@ export default function HomePage() {
               textShadow: "0 0 40px rgba(218, 165, 32, 0.3), 0 0 80px rgba(218, 165, 32, 0.1)",
             }}
           >
-            Sacred Devotions
+            Nitya Bhakti
           </h1>
 
           <p className="font-serif text-amber-300/60 mb-12 max-w-md mx-auto text-lg leading-relaxed">

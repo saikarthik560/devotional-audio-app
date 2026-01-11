@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Sacred Devotions",
+    title: "Nitya Bhakti",
   description: "A sacred digital space preserving grandfather's devotional poetry",
   icons: {
     icon: "/icons/om.svg",

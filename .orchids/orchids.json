@@ -5,5 +5,7 @@
   "startupCommands": [
     "npm install; npm run dev"
   ],
-  "templateId": "nextjs"
+  "templateId": "nextjs",
+  "deployedWithUserToken": true,
+  "vercelProjectId": "prj_KzFo98P6x7nRYqVpB5LxChBDpiM6"
 }

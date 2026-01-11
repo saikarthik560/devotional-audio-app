@@ -1,7 +1,8 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
+import { useIsMobile } from "@/hooks/useMediaQuery";
 
 interface LayeredBackgroundProps {
   backgroundImage?: string;
@@ -14,26 +15,43 @@ export function LayeredBackground({
   intensity = 1,
   showVignette = true,
 }: LayeredBackgroundProps) {
-  const [mousePosition, setMousePosition] = useState({ x: 0.5, y: 0.5 });
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   const handleMouseMove = useCallback((e: MouseEvent) => {
-    setMousePosition({
-      x: e.clientX / window.innerWidth,
-      y: e.clientY / window.innerHeight,
-    });
-  }, []);
+    if (isMobile) return;
+    const x = e.clientX / window.innerWidth;
+    const y = e.clientY / window.innerHeight;
+    
+    if (containerRef.current) {
+      containerRef.current.style.setProperty("--mouse-x", `${x * 100}%`);
+      containerRef.current.style.setProperty("--mouse-y", `${y * 100}%`);
+      containerRef.current.style.setProperty("--offset-x", `${(x - 0.5) * -20 * intensity}px`);
+      containerRef.current.style.setProperty("--offset-y", `${(y - 0.5) * -20 * intensity}px`);
+    }
+  }, [isMobile, intensity]);
 
   useEffect(() => {
+    if (isMobile) return;
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, [handleMouseMove]);
+  }, [handleMouseMove, isMobile]);
 
   return (
-    <div className="fixed inset-0 overflow-hidden pointer-events-none">
+    <div 
+      ref={containerRef}
+      className="fixed inset-0 overflow-hidden pointer-events-none"
+      style={{
+        "--mouse-x": "50%",
+        "--mouse-y": "50%",
+        "--offset-x": "0px",
+        "--offset-y": "0px",
+      } as any}
+    >
       <div
-        className="absolute inset-0"
+        className="absolute inset-0 transition-[background] duration-300 ease-out"
         style={{
-          background: `radial-gradient(ellipse at ${mousePosition.x * 100}% ${mousePosition.y * 100}%, 
+          background: `radial-gradient(ellipse at var(--mouse-x) var(--mouse-y), 
             rgba(139, 90, 43, 0.15) 0%, 
             rgba(25, 25, 40, 0.95) 50%, 
             rgba(10, 10, 20, 1) 100%)`,
@@ -41,22 +59,21 @@ export function LayeredBackground({
       />
 
       {backgroundImage && (
-        <motion.div
-          className="absolute inset-0"
-          animate={{
-            x: (mousePosition.x - 0.5) * -20 * intensity,
-            y: (mousePosition.y - 0.5) * -20 * intensity,
+        <div
+          className="absolute inset-0 transition-transform duration-500 ease-out"
+          style={{
+            transform: `translate(var(--offset-x), var(--offset-y))`,
+            willChange: "transform",
           }}
-          transition={{ type: "spring", stiffness: 50, damping: 30 }}
         >
           <div
             className="absolute inset-[-20px] bg-cover bg-center opacity-30"
             style={{
               backgroundImage: `url(${backgroundImage})`,
-              filter: "blur(2px) saturate(0.8)",
+              filter: isMobile ? "none" : "blur(2px) saturate(0.8)", // Disable blur on mobile
             }}
           />
-        </motion.div>
+        </div>
       )}
 
       <motion.div
@@ -73,6 +90,7 @@ export function LayeredBackground({
           background: `radial-gradient(ellipse at 50% 30%, 
             rgba(255, 200, 100, ${0.08 * intensity}) 0%, 
             transparent 60%)`,
+          willChange: "opacity",
         }}
       />
 
@@ -88,23 +106,27 @@ export function LayeredBackground({
         />
       )}
 
-      <motion.div
-        className="absolute inset-0"
-        animate={{
-          backgroundPosition: ["0% 0%", "100% 100%"],
-        }}
-        transition={{
-          duration: 60,
-          repeat: Infinity,
-          repeatType: "reverse",
-          ease: "linear",
-        }}
-        style={{
-          backgroundImage: `radial-gradient(circle at 20% 80%, rgba(218, 165, 32, 0.03) 0%, transparent 40%),
-                           radial-gradient(circle at 80% 20%, rgba(70, 130, 180, 0.03) 0%, transparent 40%)`,
-          backgroundSize: "200% 200%",
-        }}
-      />
+      {!isMobile && (
+        <motion.div
+          className="absolute inset-0"
+          animate={{
+            backgroundPosition: ["0% 0%", "100% 100%"],
+          }}
+          transition={{
+            duration: 60,
+            repeat: Infinity,
+            repeatType: "reverse",
+            ease: "linear",
+          }}
+          style={{
+            backgroundImage: `radial-gradient(circle at 20% 80%, rgba(218, 165, 32, 0.03) 0%, transparent 40%),
+                             radial-gradient(circle at 80% 20%, rgba(70, 130, 180, 0.03) 0%, transparent 40%)`,
+            backgroundSize: "200% 200%",
+            willChange: "background-position",
+          }}
+        />
+      )}
     </div>
   );
 }
+
