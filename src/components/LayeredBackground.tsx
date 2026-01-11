@@ -18,7 +18,12 @@ export function LayeredBackground({
   const containerRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
 
-    const handleInteraction = useCallback((clientX: number, clientY: number) => {
+  const rafRef = useRef<number | null>(null);
+
+  const handleInteraction = useCallback((clientX: number, clientY: number) => {
+    if (rafRef.current) return;
+
+    rafRef.current = requestAnimationFrame(() => {
       const x = clientX / window.innerWidth;
       const y = clientY / window.innerHeight;
       
@@ -28,26 +33,29 @@ export function LayeredBackground({
         containerRef.current.style.setProperty("--offset-x", `${(x - 0.5) * -20 * intensity}px`);
         containerRef.current.style.setProperty("--offset-y", `${(y - 0.5) * -20 * intensity}px`);
       }
-    }, [intensity]);
+      rafRef.current = null;
+    });
+  }, [intensity]);
 
-    const handleMouseMove = useCallback((e: MouseEvent) => {
-      handleInteraction(e.clientX, e.clientY);
-    }, [handleInteraction]);
+  const handleMouseMove = useCallback((e: MouseEvent) => {
+    handleInteraction(e.clientX, e.clientY);
+  }, [handleInteraction]);
 
-    const handleTouchMove = useCallback((e: TouchEvent) => {
-      if (e.touches[0]) {
-        handleInteraction(e.touches[0].clientX, e.touches[0].clientY);
-      }
-    }, [handleInteraction]);
+  const handleTouchMove = useCallback((e: TouchEvent) => {
+    if (e.touches[0]) {
+      handleInteraction(e.touches[0].clientX, e.touches[0].clientY);
+    }
+  }, [handleInteraction]);
 
-    useEffect(() => {
-      window.addEventListener("mousemove", handleMouseMove, { passive: true });
-      window.addEventListener("touchmove", handleTouchMove, { passive: true });
-      return () => {
-        window.removeEventListener("mousemove", handleMouseMove);
-        window.removeEventListener("touchmove", handleTouchMove);
-      };
-    }, [handleMouseMove, handleTouchMove]);
+  useEffect(() => {
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
+    window.addEventListener("touchmove", handleTouchMove, { passive: true });
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("touchmove", handleTouchMove);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, [handleMouseMove, handleTouchMove]);
 
   return (
     <div 
