@@ -4,10 +4,12 @@ import { motion } from "framer-motion";
 import { LayeredBackground } from "@/components/LayeredBackground";
 import { ParticleSystem } from "@/components/ParticleSystem";
 import { GlowLayer } from "@/components/GlowLayer";
+import { LordGanesha } from "@/components/LordGanesha";
 import { Diya } from "@/components/Diya";
 import { SacredButton } from "@/components/SacredButton";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Info } from "lucide-react";
 
 export default function HomePage() {
   const router = useRouter();
@@ -19,42 +21,41 @@ export default function HomePage() {
       <GlowLayer intensity={1} color="gold" />
       <ParticleSystem count={15} layer="foreground" interactive />
 
-      <div className="relative z-20 flex flex-col items-center justify-center min-h-screen px-4">
+      <div className="relative z-20 flex flex-col items-center justify-center min-h-screen px-4 py-20">
+        <div className="relative flex flex-col items-center mb-12">
+          {/* Lord Ganesha */}
+          <LordGanesha size={320} />
+          
+          {/* Diya at his feet */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1.5, delay: 0.5, ease: "easeOut" }}
+            className="absolute -bottom-28 z-30"
+          >
+            <Diya size={120} glowIntensity={1.5} />
+          </motion.div>
+        </div>
+
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.5, ease: "easeOut" }}
-          className="mb-12"
-        >
-          <Diya size={140} glowIntensity={1.2} />
-        </motion.div>
-
-        <motion.h1
-          className="font-serif text-4xl md:text-5xl text-amber-100 text-center mb-4 tracking-wider"
+          className="text-center mt-24"
           initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 0.5 }}
-          style={{
-            textShadow: "0 0 40px rgba(218, 165, 32, 0.3), 0 0 80px rgba(218, 165, 32, 0.1)",
-          }}
-        >
-          Sacred Devotions
-        </motion.h1>
-
-        <motion.p
-          className="font-serif text-amber-300/60 text-center mb-12 max-w-md text-lg"
-          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.8 }}
         >
-          A sacred space preserving grandfather&apos;s devotional poetry
-        </motion.p>
+          <h1
+            className="font-serif text-4xl md:text-6xl text-amber-100 mb-4 tracking-wider"
+            style={{
+              textShadow: "0 0 40px rgba(218, 165, 32, 0.3), 0 0 80px rgba(218, 165, 32, 0.1)",
+            }}
+          >
+            Sacred Devotions
+          </h1>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 1.1 }}
-        >
+          <p className="font-serif text-amber-300/60 mb-12 max-w-md mx-auto text-lg leading-relaxed">
+            A sacred space preserving grandfather&apos;s devotional poetry
+          </p>
+
           <SacredButton
             size="lg"
             onClick={() => router.push("/library")}
@@ -63,19 +64,20 @@ export default function HomePage() {
           </SacredButton>
         </motion.div>
 
-        <motion.nav
-          className="fixed bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-8"
+        <motion.div
+          className="fixed top-8 right-8 z-50"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 1.5 }}
         >
           <Link
             href="/about"
-            className="text-amber-400/40 hover:text-amber-300/60 transition-colors duration-500 text-sm font-serif tracking-wide"
+            className="flex items-center justify-center w-10 h-10 rounded-full border border-amber-400/20 bg-amber-400/5 text-amber-400/40 hover:text-amber-300/80 hover:border-amber-300/40 hover:bg-amber-400/10 transition-all duration-500"
+            aria-label="About"
           >
-            About
+            <Info size={20} />
           </Link>
-        </motion.nav>
+        </motion.div>
       </div>
 
       <motion.div
