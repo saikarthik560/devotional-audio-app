@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <ellipse cx="32" cy="52" rx="20" ry="8" fill="url(#diyaBase)"/>
+  <path d="M12 52c0-2 4-16 8-20h24c4 4 8 18 8 20" fill="url(#diyaBody)"/>
+  <ellipse cx="32" cy="32" rx="6" ry="4" fill="#8B4513"/>
+  <path d="M32 8c-4 8-6 16-4 24 2-8 4-16 4-24z" fill="url(#flame1)"/>
+  <path d="M32 8c4 8 6 16 4 24-2-8-4-16-4-24z" fill="url(#flame2)"/>
+  <ellipse cx="32" cy="32" rx="3" ry="2" fill="#FFF8DC"/>
+  <defs>
+    <linearGradient id="diyaBase" x1="32" y1="44" x2="32" y2="60">
+      <stop offset="0%" stop-color="#CD853F"/>
+      <stop offset="100%" stop-color="#8B4513"/>
+    </linearGradient>
+    <linearGradient id="diyaBody" x1="32" y1="32" x2="32" y2="52">
+      <stop offset="0%" stop-color="#DAA520"/>
+      <stop offset="100%" stop-color="#CD853F"/>
+    </linearGradient>
+    <linearGradient id="flame1" x1="28" y1="8" x2="32" y2="32">
+      <stop offset="0%" stop-color="#FFD700"/>
+      <stop offset="50%" stop-color="#FF8C00"/>
+      <stop offset="100%" stop-color="#FF4500"/>
+    </linearGradient>
+    <linearGradient id="flame2" x1="36" y1="8" x2="32" y2="32">
+      <stop offset="0%" stop-color="#FFFF00"/>
+      <stop offset="50%" stop-color="#FFA500"/>
+      <stop offset="100%" stop-color="#FF6347"/>
+    </linearGradient>
+  </defs>
+</svg>

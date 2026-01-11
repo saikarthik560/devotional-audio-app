@@ -1,0 +1,9 @@
+{
+  "projectId": "6aa648e6-8524-4ee8-aca7-4e5b24bc94e0",
+  "createdAt": 1768125727133,
+  "version": "1.0",
+  "startupCommands": [
+    "npm install; npm run dev"
+  ],
+  "templateId": "nextjs"
+}

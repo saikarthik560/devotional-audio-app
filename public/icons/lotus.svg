@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <ellipse cx="32" cy="48" rx="16" ry="4" fill="url(#lotusBase)"/>
+  <path d="M32 44c-8-4-14-12-14-20 6 6 10 14 14 20z" fill="url(#petal1)"/>
+  <path d="M32 44c8-4 14-12 14-20-6 6-10 14-14 20z" fill="url(#petal2)"/>
+  <path d="M32 44c-4-6-6-14-6-22 4 8 5 16 6 22z" fill="url(#petal3)"/>
+  <path d="M32 44c4-6 6-14 6-22-4 8-5 16-6 22z" fill="url(#petal4)"/>
+  <path d="M32 44c0-8 0-16 0-24 0 8 0 16 0 24z" fill="url(#petal5)"/>
+  <ellipse cx="32" cy="44" rx="4" ry="2" fill="#FFD700"/>
+  <defs>
+    <linearGradient id="lotusBase" x1="32" y1="44" x2="32" y2="52">
+      <stop offset="0%" stop-color="#90EE90"/>
+      <stop offset="100%" stop-color="#228B22"/>
+    </linearGradient>
+    <linearGradient id="petal1" x1="18" y1="24" x2="32" y2="44">
+      <stop offset="0%" stop-color="#FFB6C1"/>
+      <stop offset="100%" stop-color="#FF69B4"/>
+    </linearGradient>
+    <linearGradient id="petal2" x1="46" y1="24" x2="32" y2="44">
+      <stop offset="0%" stop-color="#FFC0CB"/>
+      <stop offset="100%" stop-color="#FF1493"/>
+    </linearGradient>
+    <linearGradient id="petal3" x1="26" y1="22" x2="32" y2="44">
+      <stop offset="0%" stop-color="#FFE4E1"/>
+      <stop offset="100%" stop-color="#FF6B6B"/>
+    </linearGradient>
+    <linearGradient id="petal4" x1="38" y1="22" x2="32" y2="44">
+      <stop offset="0%" stop-color="#FFF0F5"/>
+      <stop offset="100%" stop-color="#DB7093"/>
+    </linearGradient>
+    <linearGradient id="petal5" x1="32" y1="20" x2="32" y2="44">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#FFB6C1"/>
+    </linearGradient>
+  </defs>
+</svg>
