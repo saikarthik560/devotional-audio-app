@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { Poem } from "@/lib/poems";
 import Image from "next/image";
 import Link from "next/link";
+import { useIsMobile } from "@/hooks/useMediaQuery";
 
 interface SacredCardProps {
   poem: Poem;
@@ -11,29 +12,33 @@ interface SacredCardProps {
 }
 
 export function SacredCard({ poem, index }: SacredCardProps) {
+  const isMobile = useIsMobile();
+
   return (
-    <Link href={`/poem/${poem.id}`}>
+    <Link href={`/poem/${poem.id}`} className="block">
       <motion.div
-        className="relative group cursor-pointer active:scale-95 transition-transform duration-300 will-change-transform"
-        initial={{ opacity: 0, y: 30, rotateX: 15 }}
+        className="relative group cursor-pointer active:scale-[0.98] transition-all duration-300 will-change-transform"
+        initial={{ opacity: 0, y: isMobile ? 15 : 30, rotateX: isMobile ? 0 : 15 }}
         animate={{ opacity: 1, y: 0, rotateX: 0 }}
         transition={{
           duration: 0.6,
-          delay: index * 0.05,
+          delay: isMobile ? (index % 4) * 0.1 : index * 0.05,
           ease: "easeOut",
         }}
-        whileHover={{ 
+        whileHover={isMobile ? {} : { 
           y: -10, 
           scale: 1.03,
           rotateX: -2,
           rotateY: 2,
         }}
-        whileTap={{ scale: 0.96 }}
+        whileTap={{ scale: 0.98 }}
         style={{
           perspective: "1000px",
           transformStyle: "preserve-3d",
+          touchAction: "pan-y", // Explicitly allow vertical scrolling
         }}
       >
+
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-300 via-amber-200 to-amber-100 border-2 border-amber-500 shadow-2xl shadow-black/60">
           <motion.div
             className="absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent"

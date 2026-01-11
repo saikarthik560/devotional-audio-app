@@ -49,13 +49,14 @@ export default function LibraryPage() {
       <GlowLayer intensity={0.8} color="gold" />
       <ParticleSystem count={10} layer="foreground" interactive />
 
-      <div className="relative z-40 min-h-screen px-4 py-8 md:px-8">
-        <motion.header
-          className="max-w-5xl mx-auto mb-12"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-        >
+        <div className="relative z-[60] min-h-screen px-4 py-8 md:px-8">
+          <motion.header
+            className="max-w-5xl mx-auto mb-10"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+
           <div className="flex items-center justify-between mb-8">
             <Link
               href="/"
@@ -97,39 +98,40 @@ export default function LibraryPage() {
             </motion.p>
 
             <motion.div
-              className="flex flex-wrap justify-center gap-4"
+              className="flex flex-wrap justify-center gap-3 md:gap-4"
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.5 }}
             >
               <div className="flex items-center gap-2">
-                <span className="text-amber-200/80 text-xs font-serif font-medium">Deity:</span>
-              <select
-                value={selectedDeity}
-                onChange={(e) => setSelectedDeity(e.target.value)}
-                className="bg-amber-900/40 border border-amber-500/40 rounded-lg px-3 py-1.5 text-sm text-amber-50 focus:outline-none focus:border-amber-400/60 font-serif"
-              >
-                <option value="all">All Deities</option>
-                {deities.map((deity) => (
-                  <option key={deity} value={deity}>{deity}</option>
-                ))}
-              </select>
-            </div>
+                <span className="text-amber-200/60 text-[10px] md:text-xs font-serif font-medium uppercase tracking-wider">Deity</span>
+                <select
+                  value={selectedDeity}
+                  onChange={(e) => setSelectedDeity(e.target.value)}
+                  className="bg-amber-950/40 border border-amber-500/20 rounded-lg px-2 py-1 md:px-3 md:py-1.5 text-xs md:text-sm text-amber-50 focus:outline-none focus:border-amber-400/60 font-serif transition-colors"
+                >
+                  <option value="all">All</option>
+                  {deities.map((deity) => (
+                    <option key={deity} value={deity}>{deity}</option>
+                  ))}
+                </select>
+              </div>
 
-            <div className="flex items-center gap-2">
-              <span className="text-amber-200/80 text-xs font-serif font-medium">Mood:</span>
-              <select
-                value={selectedMood}
-                onChange={(e) => setSelectedMood(e.target.value)}
-                className="bg-amber-900/40 border border-amber-500/40 rounded-lg px-3 py-1.5 text-sm text-amber-50 focus:outline-none focus:border-amber-400/60 font-serif"
-              >
-                <option value="all">All Moods</option>
-                {moods.map((mood) => (
-                  <option key={mood} value={mood}>{mood}</option>
-                ))}
-              </select>
-            </div>
-          </motion.div>
+              <div className="flex items-center gap-2">
+                <span className="text-amber-200/60 text-[10px] md:text-xs font-serif font-medium uppercase tracking-wider">Mood</span>
+                <select
+                  value={selectedMood}
+                  onChange={(e) => setSelectedMood(e.target.value)}
+                  className="bg-amber-950/40 border border-amber-500/20 rounded-lg px-2 py-1 md:px-3 md:py-1.5 text-xs md:text-sm text-amber-50 focus:outline-none focus:border-amber-400/60 font-serif transition-colors"
+                >
+                  <option value="all">All</option>
+                  {moods.map((mood) => (
+                    <option key={mood} value={mood}>{mood}</option>
+                  ))}
+                </select>
+              </div>
+            </motion.div>
+
         </motion.header>
 
         <main className="max-w-5xl mx-auto pb-16">
