@@ -188,6 +188,7 @@ export function LordGanesha({ size = 400 }: LordGaneshaProps) {
                 marginTop: -omSize / 2,
                 x: omX,
                 y: omY,
+                rotate: 0,
                 opacity: omOpacity,
                 scale: omScale,
                 zIndex: 201,
@@ -199,7 +200,7 @@ export function LordGanesha({ size = 400 }: LordGaneshaProps) {
                 style={{ 
                   width: "100%", 
                   height: "100%",
-                  rotate: omRotation,
+                  rotate: 0,
                 }}
               >
                 <Image 

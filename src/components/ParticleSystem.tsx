@@ -82,12 +82,12 @@ const ParticleItem = memo(({
           willChange: "transform, opacity",
         }}
         initial={{ opacity: 0, top: "-10vh" }}
-        animate={{
-          opacity: [0, particle.opacity, particle.opacity, 0],
-          top: ["-10vh", "110vh"],
-          rotate: isMobile ? 0 : [0, 360],
-          scale: [scaleBase, scaleBase * 1.1, scaleBase],
-        }}
+          animate={{
+            opacity: [0, particle.opacity, particle.opacity, 0],
+            top: ["-10vh", "110vh"],
+            rotate: 0,
+            scale: [scaleBase, scaleBase * 1.1, scaleBase],
+          }}
         transition={{
           top: {
             duration: particle.duration,
