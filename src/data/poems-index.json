@@ -1,13 +1,13 @@
 [
   {
     "id": "poem-001",
-    "title": "Krishna Bhajan",
-    "deity": "Krishna",
+    "title": "Lord Vishnu's presense",
+    "deity": "Shri Hari",
     "mood": "Calm",
     "language": "Sanskrit",
     "duration": "04:01",
     "recorded_by": "Grandfather",
-    "recorded_year": "2023",
+    "recorded_year": "2026",
     "audioUrl": "/poems/poem-001/audio.mp3",
     "deityImageUrl": "/poems/poem-001/deity.png",
     "backgroundUrl": "/poems/poem-001/background.jpg",
