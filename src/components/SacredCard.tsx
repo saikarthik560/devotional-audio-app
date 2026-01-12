@@ -35,18 +35,19 @@ export function SacredCard({ poem, index }: SacredCardProps) {
   };
 
   const glowControls = useAnimation();
+  const rippleControls = useAnimation();
 
   const handleTap = async () => {
     // Divine glow effect on tap
     await Promise.all([
       glowControls.start({
-        opacity: [0, 0.8, 0],
-        scale: [0.9, 1.2],
-        transition: { duration: 0.6, ease: "easeOut" }
+        opacity: [0, 1, 0],
+        scale: [0.9, 1.4],
+        transition: { duration: 0.5, ease: "easeOut" }
       }),
       rippleControls.start({
-        opacity: [0, 0.3, 0],
-        scale: [0.8, 1.8],
+        opacity: [0, 0.5, 0],
+        scale: [0.8, 2],
         transition: { duration: 0.6 }
       })
     ]);
@@ -75,17 +76,17 @@ export function SacredCard({ poem, index }: SacredCardProps) {
           touchAction: "pan-y",
         }}
       >
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-200 via-amber-100 to-amber-50 border-2 border-amber-400 shadow-xl shadow-amber-900/20 group-hover:border-amber-300 transition-colors duration-500">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-100 via-white to-amber-50 border-2 border-amber-400 shadow-xl shadow-amber-900/20 group-hover:border-amber-300 transition-colors duration-500">
           {/* Divine Glow Effect */}
           <motion.div
-            className="absolute inset-0 bg-amber-300/40 pointer-events-none blur-2xl rounded-2xl"
+            className="absolute inset-0 bg-amber-400/50 pointer-events-none blur-3xl rounded-2xl"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={glowControls}
           />
           
           {/* Ripple Effect */}
           <motion.div
-            className="absolute inset-0 bg-white pointer-events-none rounded-2xl"
+            className="absolute inset-0 bg-white/60 pointer-events-none rounded-2xl"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={rippleControls}
           />

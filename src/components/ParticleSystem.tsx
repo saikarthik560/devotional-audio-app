@@ -83,7 +83,7 @@ export function ParticleSystem({
   return (
     <div
       className="fixed inset-0 overflow-hidden pointer-events-none"
-      style={{ zIndex: layer === "foreground" ? 30 : 5 }}
+      style={{ zIndex: layer === "foreground" ? 70 : 5 }}
     >
       {particles.map((particle) => (
         <ParticleItem
