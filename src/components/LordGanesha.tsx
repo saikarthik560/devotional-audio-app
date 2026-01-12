@@ -55,16 +55,16 @@ export function LordGanesha({ size = 400 }: LordGaneshaProps) {
   const orbitRadius = isMobile ? size * 0.42 : size * 0.48;
   const omSize = isMobile ? 36 : 52;
   
-  // Speed increased by 25% from previous values (0.48 -> 0.60, 0.58 -> 0.73)
-  const orbitSpeed = isMobile ? 0.60 : 0.73;
-  const totalRotations = 3;
-
-  const animationRef = useRef<number>(0);
-  const frameRef = useRef<number>(0);
-  const lastTrailSpawnRef = useRef<number>(0);
-
-  // Transform for Om rotation
-  const omRotation = useTransform(orbitAngle, (angle) => angle + 90);
+    // Speed increased by 25% from previous values (0.60 -> 0.75, 0.73 -> 0.91)
+    const orbitSpeed = isMobile ? 0.75 : 0.91;
+    const totalRotations = 3;
+  
+    const animationRef = useRef<number>(0);
+    const frameRef = useRef<number>(0);
+    const lastTrailSpawnRef = useRef<number>(0);
+  
+    // Transform for Om rotation (set to 0 for stiff rotation)
+    const omRotation = 0;
   const omX = useTransform(orbitAngle, (angle) => Math.cos(angle * Math.PI / 180) * orbitRadius);
   const omY = useTransform(orbitAngle, (angle) => Math.sin(angle * Math.PI / 180) * orbitRadius);
 
