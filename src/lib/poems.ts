@@ -1,27 +1,21 @@
-import poemsIndex from "@/data/poems-index.json";
+import type { Poem, PoemMeta } from "./poems-server";
 
-export interface PoemMeta {
-  id: string;
-  title: string;
-  deity: "Krishna" | "Shiva" | "Rama" | "Devi" | "Other";
-  mood: "Calm" | "Energetic" | "Meditative";
-  language: "Sanskrit" | "Telugu" | "Hindi" | "Other";
-  duration: string;
-  recorded_by: string;
-  recorded_year: string;
-}
-
-export interface Poem extends PoemMeta {
-  audioUrl: string;
-  deityImageUrl: string;
-  backgroundUrl: string;
-  hasAudio: boolean;
-  hasDeityImage: boolean;
-  hasBackground: boolean;
-}
+export type { Poem, PoemMeta };
 
 export async function getAllPoems(): Promise<Poem[]> {
-  return poemsIndex as Poem[];
+  if (typeof window === "undefined") {
+    const { getPoemsData } = await import("./poems-server");
+    return getPoemsData();
+  }
+  
+  try {
+    const response = await fetch("/api/poems");
+    if (!response.ok) throw new Error("Failed to fetch poems");
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching poems:", error);
+    return [];
+  }
 }
 
 export async function getPoemById(id: string): Promise<Poem | null> {
