@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useAnimation } from "framer-motion";
 import { LayeredBackground } from "@/components/LayeredBackground";
 import { ParticleSystem } from "@/components/ParticleSystem";
 import { GlowLayer } from "@/components/GlowLayer";

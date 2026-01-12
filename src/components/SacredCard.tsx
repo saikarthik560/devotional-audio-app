@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useAnimation } from "framer-motion";
 import { Poem } from "@/lib/poems";
 import Image from "next/image";
 import Link from "next/link";
