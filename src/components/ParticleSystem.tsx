@@ -65,22 +65,20 @@ export function ParticleSystem({
   }, [count, icons, layer]);
 
   const handleMouseMove = useCallback((e: MouseEvent | TouchEvent) => {
-    if (isMobile) return; // Disable parallax on mobile for performance
-    const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
-    const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
-    mouseX.set(clientX / window.innerWidth);
-    mouseY.set(clientY / window.innerHeight);
+    isMobile ? null : (() => {
+      const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
+      const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
+      mouseX.set(clientX / window.innerWidth);
+      mouseY.set(clientY / window.innerHeight);
+    })();
   }, [mouseX, mouseY, isMobile]);
 
   useEffect(() => {
-    if (!interactive || isMobile) return;
-    window.addEventListener("mousemove", handleMouseMove);
+    (!interactive || isMobile) ? null : window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [handleMouseMove, interactive, isMobile]);
 
-  if (!mounted) return null;
-
-  return (
+  return !mounted ? null : (
     <div
       className="fixed inset-0 overflow-hidden pointer-events-none"
       style={{ zIndex: layer === "foreground" ? 70 : 5 }}

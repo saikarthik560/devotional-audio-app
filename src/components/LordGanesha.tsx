@@ -16,17 +16,18 @@ export function LordGanesha({ size = 400 }: LordGaneshaProps) {
   const [isBlessing, setIsBlessing] = useState(false);
 
   const handleTap = async () => {
-    if (isBlessing) return;
-    setIsBlessing(true);
-    
-    // Trigger blessing ripple
-    await blessingControls.start({
-      scale: [1, 2],
-      opacity: [0, 0.5, 0],
-      transition: { duration: 1, ease: "easeOut" }
-    });
-    
-    setIsBlessing(false);
+    isBlessing ? null : await (async () => {
+      setIsBlessing(true);
+      
+      // Trigger blessing ripple
+      await blessingControls.start({
+        scale: [1, 2],
+        opacity: [0, 0.5, 0],
+        transition: { duration: 1, ease: "easeOut" }
+      });
+      
+      setIsBlessing(false);
+    })();
   };
 
   return (

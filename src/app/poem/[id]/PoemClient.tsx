@@ -30,36 +30,30 @@ export function PoemClient({ poem }: PoemClientProps) {
   } = useAudioAnalyzer();
 
   useEffect(() => {
-    if (poem?.hasAudio) {
-      load(poem.audioUrl);
-    }
+    poem?.hasAudio ? load(poem.audioUrl) : null;
   }, [poem, load]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (e.key === "Escape" && sacredMode) {
-      setSacredMode(false);
-    }
-    if (e.key === " ") {
-      e.preventDefault();
-      toggle();
+    switch (e.key) {
+      case "Escape":
+        sacredMode ? setSacredMode(false) : null;
+        break;
+      case " ":
+        e.preventDefault();
+        toggle();
+        break;
+      default:
+        break;
     }
   }, [sacredMode, toggle]);
 
   useEffect(() => {
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [handleKeyDown]);
-
-  useEffect(() => {
-    if (sacredMode) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    document.body.style.overflow = sacredMode ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
   }, [sacredMode]);
+
 
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);

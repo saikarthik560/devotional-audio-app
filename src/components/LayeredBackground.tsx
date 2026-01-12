@@ -20,42 +20,39 @@ export function LayeredBackground({
 
   const rafRef = useRef<number | null>(null);
 
-  const handleInteraction = useCallback((clientX: number, clientY: number) => {
-    if (rafRef.current) return;
+    const handleInteraction = useCallback((clientX: number, clientY: number) => {
+      rafRef.current ? null : (rafRef.current = requestAnimationFrame(() => {
+        const x = clientX / window.innerWidth;
+        const y = clientY / window.innerHeight;
+        
+        containerRef.current ? (() => {
+          containerRef.current!.style.setProperty("--mouse-x", `${x * 100}%`);
+          containerRef.current!.style.setProperty("--mouse-y", `${y * 100}%`);
+          containerRef.current!.style.setProperty("--offset-x", `${(x - 0.5) * -20 * intensity}px`);
+          containerRef.current!.style.setProperty("--offset-y", `${(y - 0.5) * -20 * intensity}px`);
+        })() : null;
+        rafRef.current = null;
+      }));
+    }, [intensity]);
 
-    rafRef.current = requestAnimationFrame(() => {
-      const x = clientX / window.innerWidth;
-      const y = clientY / window.innerHeight;
-      
-      if (containerRef.current) {
-        containerRef.current.style.setProperty("--mouse-x", `${x * 100}%`);
-        containerRef.current.style.setProperty("--mouse-y", `${y * 100}%`);
-        containerRef.current.style.setProperty("--offset-x", `${(x - 0.5) * -20 * intensity}px`);
-        containerRef.current.style.setProperty("--offset-y", `${(y - 0.5) * -20 * intensity}px`);
-      }
-      rafRef.current = null;
-    });
-  }, [intensity]);
+    const handleMouseMove = useCallback((e: MouseEvent) => {
+      handleInteraction(e.clientX, e.clientY);
+    }, [handleInteraction]);
 
-  const handleMouseMove = useCallback((e: MouseEvent) => {
-    handleInteraction(e.clientX, e.clientY);
-  }, [handleInteraction]);
+    const handleTouchMove = useCallback((e: TouchEvent) => {
+      e.touches[0] ? handleInteraction(e.touches[0].clientX, e.touches[0].clientY) : null;
+    }, [handleInteraction]);
 
-  const handleTouchMove = useCallback((e: TouchEvent) => {
-    if (e.touches[0]) {
-      handleInteraction(e.touches[0].clientX, e.touches[0].clientY);
-    }
-  }, [handleInteraction]);
+    useEffect(() => {
+      window.addEventListener("mousemove", handleMouseMove, { passive: true });
+      window.addEventListener("touchmove", handleTouchMove, { passive: true });
+      return () => {
+        window.removeEventListener("mousemove", handleMouseMove);
+        window.removeEventListener("touchmove", handleTouchMove);
+        rafRef.current ? cancelAnimationFrame(rafRef.current) : null;
+      };
+    }, [handleMouseMove, handleTouchMove]);
 
-  useEffect(() => {
-    window.addEventListener("mousemove", handleMouseMove, { passive: true });
-    window.addEventListener("touchmove", handleTouchMove, { passive: true });
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("touchmove", handleTouchMove);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
-  }, [handleMouseMove, handleTouchMove]);
 
   return (
     <div 

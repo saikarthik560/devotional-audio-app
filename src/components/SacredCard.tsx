@@ -53,13 +53,9 @@ export function SacredCard({ poem, index }: SacredCardProps) {
     ]);
   };
 
-  if (!mounted) {
-    return (
-      <div className="h-[160px] rounded-2xl bg-amber-200/20 border-2 border-amber-500/20" />
-    );
-  }
-
-  return (
+  return !mounted ? (
+    <div className="h-[160px] rounded-2xl bg-amber-200/20 border-2 border-amber-500/20" />
+  ) : (
     <Link href={`/poem/${poem.id}`} className="block">
       <motion.div
         className="relative group cursor-pointer active:scale-[0.98] transition-all duration-300 will-change-transform"

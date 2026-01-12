@@ -34,22 +34,17 @@ export default function LibraryPage() {
   }, []);
 
   useEffect(() => {
-    if (!mounted) return;
-    let filtered = poems;
-    if (selectedDeity !== "all") {
-      filtered = filtered.filter((p) => p.deity === selectedDeity);
-    }
-    if (selectedMood !== "all") {
-      filtered = filtered.filter((p) => p.mood === selectedMood);
-    }
-    setFilteredPoems(filtered);
+    !mounted ? null : setFilteredPoems(
+      poems.filter((p) => 
+        (selectedDeity === "all" || p.deity === selectedDeity) && 
+        (selectedMood === "all" || p.mood === selectedMood)
+      )
+    );
   }, [selectedDeity, selectedMood, poems, mounted]);
 
-  if (!mounted) {
-    return <div className="min-h-screen bg-[#0a0a14]" />;
-  }
-
-  return (
+  return !mounted ? (
+    <div className="min-h-screen bg-[#0a0a14]" />
+  ) : (
     <div className="relative min-h-screen overflow-x-hidden bg-[#0a0a14] selection:bg-amber-500/30">
       <LayeredBackground intensity={1} />
       <ParticleSystem count={15} layer="background" interactive />

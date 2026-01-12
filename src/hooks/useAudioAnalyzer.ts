@@ -27,100 +27,88 @@ export function useAudioAnalyzer(): AudioAnalyzerReturn {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
 
-  const initAudioContext = useCallback(() => {
-    if (!audioRef.current || audioContextRef.current) return;
+    const initAudioContext = useCallback(() => {
+      (!audioRef.current || audioContextRef.current) ? null : (() => {
+        const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+        audioContextRef.current = new AudioContextClass();
+        analyzerRef.current = audioContextRef.current.createAnalyser();
+        analyzerRef.current.fftSize = 256;
+        analyzerRef.current.smoothingTimeConstant = 0.8;
 
-    const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-    audioContextRef.current = new AudioContextClass();
-    analyzerRef.current = audioContextRef.current.createAnalyser();
-    analyzerRef.current.fftSize = 256;
-    analyzerRef.current.smoothingTimeConstant = 0.8;
+        sourceRef.current = audioContextRef.current.createMediaElementSource(audioRef.current!);
+        sourceRef.current.connect(analyzerRef.current);
+        analyzerRef.current.connect(audioContextRef.current.destination);
+      })();
+    }, []);
 
-    sourceRef.current = audioContextRef.current.createMediaElementSource(audioRef.current);
-    sourceRef.current.connect(analyzerRef.current);
-    analyzerRef.current.connect(audioContextRef.current.destination);
-  }, []);
+    const analyzeAudio = useCallback(() => {
+      !analyzerRef.current ? (animationFrameRef.current = requestAnimationFrame(analyzeAudio)) : (() => {
+        const dataArray = new Uint8Array(analyzerRef.current!.frequencyBinCount);
+        analyzerRef.current!.getByteFrequencyData(dataArray);
 
-  const analyzeAudio = useCallback(() => {
-    if (!analyzerRef.current) {
-      animationFrameRef.current = requestAnimationFrame(analyzeAudio);
-      return;
-    }
+        const average = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
+        const normalizedLevel = Math.min(average / 128, 1);
+        setAudioLevel(normalizedLevel);
 
-    const dataArray = new Uint8Array(analyzerRef.current.frequencyBinCount);
-    analyzerRef.current.getByteFrequencyData(dataArray);
+        animationFrameRef.current = requestAnimationFrame(analyzeAudio);
+      })();
+    }, []);
 
-    const average = dataArray.reduce((a, b) => a + b, 0) / dataArray.length;
-    const normalizedLevel = Math.min(average / 128, 1);
-    setAudioLevel(normalizedLevel);
+    const load = useCallback((src: string) => {
+      !audioRef.current ? (() => {
+        audioRef.current = new Audio();
+        audioRef.current.crossOrigin = "anonymous";
+        
+        audioRef.current.addEventListener("timeupdate", () => {
+          setCurrentTime(audioRef.current?.currentTime || 0);
+        });
+        
+        audioRef.current.addEventListener("loadedmetadata", () => {
+          setDuration(audioRef.current?.duration || 0);
+        });
+        
+        audioRef.current.addEventListener("ended", () => {
+          setIsPlaying(false);
+          setAudioLevel(0);
+        });
+        
+        audioRef.current.addEventListener("play", () => setIsPlaying(true));
+        audioRef.current.addEventListener("pause", () => setIsPlaying(false));
+      })() : null;
 
-    animationFrameRef.current = requestAnimationFrame(analyzeAudio);
-  }, []);
+      audioRef.current!.src = src;
+      audioRef.current!.load();
+    }, []);
 
-  const load = useCallback((src: string) => {
-    if (!audioRef.current) {
-      audioRef.current = new Audio();
-      audioRef.current.crossOrigin = "anonymous";
-      
-      audioRef.current.addEventListener("timeupdate", () => {
-        setCurrentTime(audioRef.current?.currentTime || 0);
-      });
-      
-      audioRef.current.addEventListener("loadedmetadata", () => {
-        setDuration(audioRef.current?.duration || 0);
-      });
-      
-      audioRef.current.addEventListener("ended", () => {
-        setIsPlaying(false);
-        setAudioLevel(0);
-      });
-      
-      audioRef.current.addEventListener("play", () => setIsPlaying(true));
-      audioRef.current.addEventListener("pause", () => setIsPlaying(false));
-    }
+    const play = useCallback(async () => {
+      !audioRef.current ? null : await (async () => {
+        initAudioContext();
+        
+        audioContextRef.current?.state === "suspended" ? await audioContextRef.current.resume() : null;
+        
+        await audioRef.current!.play();
+        analyzeAudio();
+      })();
+    }, [initAudioContext, analyzeAudio]);
 
-    audioRef.current.src = src;
-    audioRef.current.load();
-  }, []);
+    const pause = useCallback(() => {
+      audioRef.current?.pause();
+      cancelAnimationFrame(animationFrameRef.current);
+      setAudioLevel(0);
+    }, []);
 
-  const play = useCallback(async () => {
-    if (!audioRef.current) return;
-    
-    initAudioContext();
-    
-    if (audioContextRef.current?.state === "suspended") {
-      await audioContextRef.current.resume();
-    }
-    
-    await audioRef.current.play();
-    analyzeAudio();
-  }, [initAudioContext, analyzeAudio]);
+    const toggle = useCallback(async () => {
+      isPlaying ? pause() : await play();
+    }, [isPlaying, play, pause]);
 
-  const pause = useCallback(() => {
-    audioRef.current?.pause();
-    cancelAnimationFrame(animationFrameRef.current);
-    setAudioLevel(0);
-  }, []);
+    const seek = useCallback((time: number) => {
+      audioRef.current ? (audioRef.current.currentTime = time) : null;
+    }, []);
 
-  const toggle = useCallback(async () => {
-    if (isPlaying) {
-      pause();
-    } else {
-      await play();
-    }
-  }, [isPlaying, play, pause]);
+    const setVolume = useCallback((volume: number) => {
+      audioRef.current ? (audioRef.current.volume = Math.max(0, Math.min(1, volume))) : null;
+    }, []);
 
-  const seek = useCallback((time: number) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = time;
-    }
-  }, []);
-
-  const setVolume = useCallback((volume: number) => {
-    if (audioRef.current) {
-      audioRef.current.volume = Math.max(0, Math.min(1, volume));
-    }
-  }, []);
 
   useEffect(() => {
     return () => {
