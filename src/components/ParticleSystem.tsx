@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform, useAnimation } from "framer-motion";
 import { useEffect, useState, useCallback, useMemo } from "react";
 import Image from "next/image";
 import { useIsMobile } from "@/hooks/useMediaQuery";
@@ -92,7 +92,7 @@ export function ParticleSystem({
           springX={springX}
           springY={springY}
           audioIntensity={audioIntensity}
-          interactive={interactive && !isMobile}
+          interactive={interactive}
           layer={layer}
           isMobile={isMobile}
         />
@@ -120,72 +120,93 @@ function ParticleItem({
   layer,
   isMobile,
 }: ParticleItemProps) {
-  const influence = layer === "foreground" ? 100 : 50;
-  
-  const tx = useTransform(springX, [0, 1], [influence, -influence]);
-  const ty = useTransform(springY, [0, 1], [influence, -influence]);
+    const influence = layer === "foreground" ? 100 : 50;
+    const controls = useAnimation();
+    
+    const tx = useTransform(springX, [0, 1], [influence, -influence]);
+    const ty = useTransform(springY, [0, 1], [influence, -influence]);
 
-  const scaleBase = 1 + audioIntensity * 0.3;
-  const glowIntensity = audioIntensity * 0.5;
+    const scaleBase = 1 + audioIntensity * 0.3;
+    const glowIntensity = audioIntensity * 0.5;
 
-  return (
-    <motion.div
-      className="absolute"
-      style={{
-        left: `${particle.initialX}%`,
-        x: interactive ? tx : 0,
-        y: interactive ? ty : 0,
-        width: particle.size,
-        height: particle.size,
-        willChange: "transform, opacity",
-      }}
-      initial={{ opacity: 0, top: "-10vh" }}
-      animate={{
-        opacity: [0, particle.opacity, particle.opacity, 0],
-        top: ["-10vh", "110vh"],
-        rotate: isMobile ? 0 : [0, 360], // Disable rotation on mobile
-        scale: [scaleBase, scaleBase * 1.1, scaleBase],
-      }}
-      transition={{
-        top: {
-          duration: particle.duration,
-          repeat: Infinity,
-          ease: "linear",
-          delay: -particle.delay,
-        },
-        opacity: {
-          duration: particle.duration,
-          repeat: Infinity,
-          ease: "linear",
-          delay: -particle.delay,
-        },
-        rotate: {
-          duration: particle.duration * 1.5,
-          repeat: Infinity,
-          ease: "linear",
-        },
-        scale: {
-          duration: 4,
-          repeat: Infinity,
-          ease: "easeInOut",
-        },
-      }}
-    >
-      <div
-        className="relative w-full h-full"
+    const handleInteraction = async () => {
+      if (!interactive) return;
+      await controls.start({
+        scale: scaleBase * 1.5,
+        opacity: 1,
+        filter: "brightness(2) blur(2px)",
+        transition: { duration: 0.3, ease: "easeOut" }
+      });
+      await controls.start({
+        scale: scaleBase,
+        opacity: particle.opacity,
+        filter: "brightness(1) blur(0px)",
+        transition: { duration: 0.8, ease: "easeInOut" }
+      });
+    };
+
+    return (
+      <motion.div
+        className="absolute cursor-pointer pointer-events-auto"
         style={{
-          // Disable expensive filter on mobile
-          filter: isMobile ? "none" : `drop-shadow(0 0 ${4 + glowIntensity * 8}px rgba(255, 200, 100, ${0.3 + glowIntensity}))`,
+          left: `${particle.initialX}%`,
+          x: interactive ? tx : 0,
+          y: interactive ? ty : 0,
+          width: particle.size,
+          height: particle.size,
+          willChange: "transform, opacity",
         }}
+        initial={{ opacity: 0, top: "-10vh" }}
+        animate={{
+          opacity: [0, particle.opacity, particle.opacity, 0],
+          top: ["-10vh", "110vh"],
+          rotate: isMobile ? 0 : [0, 360], // Disable rotation on mobile
+          scale: [scaleBase, scaleBase * 1.1, scaleBase],
+        }}
+        transition={{
+          top: {
+            duration: particle.duration,
+            repeat: Infinity,
+            ease: "linear",
+            delay: -particle.delay,
+          },
+          opacity: {
+            duration: particle.duration,
+            repeat: Infinity,
+            ease: "linear",
+            delay: -particle.delay,
+          },
+          rotate: {
+            duration: particle.duration * 1.5,
+            repeat: Infinity,
+            ease: "linear",
+          },
+          scale: {
+            duration: 4,
+            repeat: Infinity,
+            ease: "easeInOut",
+          },
+        }}
+        onTap={handleInteraction}
+        whileHover={isMobile ? {} : { scale: scaleBase * 1.2, opacity: 1 }}
       >
-        <Image
-          src={particle.icon}
-          alt=""
-          fill
-          className="object-contain"
-          style={{ opacity: 0.8 }}
-        />
-      </div>
-    </motion.div>
-  );
+        <motion.div
+          className="relative w-full h-full"
+          animate={controls}
+          style={{
+            // Disable expensive filter on mobile unless interacting
+            filter: isMobile ? "none" : `drop-shadow(0 0 ${4 + glowIntensity * 8}px rgba(255, 200, 100, ${0.3 + glowIntensity}))`,
+          }}
+        >
+          <Image
+            src={particle.icon}
+            alt=""
+            fill
+            className="object-contain"
+            style={{ opacity: 0.8 }}
+          />
+        </motion.div>
+      </motion.div>
+    );
+
 }

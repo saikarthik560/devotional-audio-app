@@ -34,19 +34,27 @@ export function SacredCard({ poem, index }: SacredCardProps) {
     }
   };
 
-  const rippleControls = useAnimation();
+  const glowControls = useAnimation();
 
   const handleTap = async () => {
-    await rippleControls.start({
-      opacity: [0, 0.2, 0],
-      scale: [0.8, 1.5],
-      transition: { duration: 0.5 }
-    });
+    // Divine glow effect on tap
+    await Promise.all([
+      glowControls.start({
+        opacity: [0, 0.8, 0],
+        scale: [0.9, 1.2],
+        transition: { duration: 0.6, ease: "easeOut" }
+      }),
+      rippleControls.start({
+        opacity: [0, 0.3, 0],
+        scale: [0.8, 1.8],
+        transition: { duration: 0.6 }
+      })
+    ]);
   };
 
   if (!mounted) {
     return (
-      <div className="h-[160px] rounded-2xl bg-amber-200/10 border-2 border-amber-500/10" />
+      <div className="h-[160px] rounded-2xl bg-amber-200/20 border-2 border-amber-500/20" />
     );
   }
 
@@ -67,7 +75,14 @@ export function SacredCard({ poem, index }: SacredCardProps) {
           touchAction: "pan-y",
         }}
       >
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-300 via-amber-200 to-amber-100 border-2 border-amber-500 shadow-xl shadow-black/40">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-200 via-amber-100 to-amber-50 border-2 border-amber-400 shadow-xl shadow-amber-900/20 group-hover:border-amber-300 transition-colors duration-500">
+          {/* Divine Glow Effect */}
+          <motion.div
+            className="absolute inset-0 bg-amber-300/40 pointer-events-none blur-2xl rounded-2xl"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={glowControls}
+          />
+          
           {/* Ripple Effect */}
           <motion.div
             className="absolute inset-0 bg-white pointer-events-none rounded-2xl"
