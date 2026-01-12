@@ -21,18 +21,19 @@ export function SacredCard({ poem, index }: SacredCardProps) {
   }, []);
 
   // Simple animation variants to avoid hydration/isMobile flip issues
-  const cardVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: {
-        duration: 0.5,
-        delay: Math.min(index * 0.1, 0.8),
-        ease: "easeOut"
+    const cardVariants = {
+      hidden: { opacity: 0, y: 20 },
+      visible: { 
+        opacity: 1, 
+        y: 0,
+        transition: {
+          duration: 0.5,
+          delay: Math.min(index * 0.1, 0.8),
+          ease: "easeOut"
+        } as const
       }
-    }
-  };
+    };
+
 
   const glowControls = useAnimation();
   const rippleControls = useAnimation();

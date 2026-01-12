@@ -71,9 +71,8 @@ export function PoemClient({ poem }: PoemClientProps) {
 
   const shimmerControls = useAnimation();
 
-  const handleDeityTap = async (e: React.MouseEvent | React.TouchEvent) => {
-    e.stopPropagation(); // Don't exit sacred mode
-    await shimmerControls.start({
+  const handleDeityTap = (e: any) => {
+    shimmerControls.start({
       opacity: [0.6, 1, 0.6],
       filter: ["brightness(1) blur(0px)", "brightness(1.5) blur(2px)", "brightness(1) blur(0px)"],
       transition: { duration: 0.8 }
