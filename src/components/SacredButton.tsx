@@ -2,6 +2,7 @@
 
 import { motion, useAnimation } from "framer-motion";
 import { ReactNode } from "react";
+import { useIsMobile } from "@/hooks/useMediaQuery";
 
 interface SacredButtonProps {
   children: ReactNode;
@@ -21,6 +22,7 @@ export function SacredButton({
   className = "",
 }: SacredButtonProps) {
   const controls = useAnimation();
+  const isMobile = useIsMobile();
 
   const baseStyles = "relative overflow-hidden rounded-full font-serif tracking-wider transition-all duration-500 active:scale-95 touch-manipulation";
   
