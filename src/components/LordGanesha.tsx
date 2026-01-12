@@ -1,9 +1,9 @@
 "use client";
 
-import { motion, useAnimation, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
 import Image from "next/image";
 import { useIsMobile } from "@/hooks/useMediaQuery";
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef, useEffect, memo } from "react";
 
 interface LordGaneshaProps {
   size?: number;
@@ -15,28 +15,58 @@ interface TrailParticle {
   y: number;
   size: number;
   duration: number;
+  opacity: number;
 }
+
+const Particle = memo(({ p }: { p: TrailParticle }) => (
+  <motion.div
+    className="absolute rounded-full"
+    style={{
+      width: p.size,
+      height: p.size,
+      left: "50%",
+      top: "50%",
+      marginLeft: -p.size / 2,
+      marginTop: -p.size / 2,
+      background: "radial-gradient(circle, rgba(251,191,36,1) 0%, rgba(251,191,36,0.6) 50%, transparent 100%)",
+      boxShadow: "0 0 10px rgba(251,191,36,0.8), 0 0 20px rgba(251,191,36,0.4)",
+      willChange: "transform, opacity",
+    }}
+    initial={{ x: p.x, y: p.y, opacity: p.opacity, scale: 1 }}
+    animate={{ opacity: 0, scale: 0.1 }}
+    transition={{ duration: p.duration, ease: "easeOut" }}
+  />
+));
+
+Particle.displayName = "Particle";
 
 export function LordGanesha({ size = 400 }: LordGaneshaProps) {
   const isMobile = useIsMobile();
   const rayCount = isMobile ? 4 : 8;
-  const blessingControls = useAnimation();
-  const omControls = useAnimation();
   const [isAnimating, setIsAnimating] = useState(false);
   const [showOm, setShowOm] = useState(false);
   const [trailParticles, setTrailParticles] = useState<TrailParticle[]>([]);
-  const [orbitAngle, setOrbitAngle] = useState(0);
+  
+  // Motion values for smooth animation without re-renders
+  const orbitAngle = useMotionValue(-90);
+  const omOpacity = useMotionValue(0);
+  const omScale = useMotionValue(0);
+  
+  const orbitRadius = isMobile ? size * 0.42 : size * 0.48;
+  const omSize = isMobile ? 36 : 52;
+  
+  // Speed increased by 25% from previous values (0.48 -> 0.60, 0.58 -> 0.73)
+  const orbitSpeed = isMobile ? 0.60 : 0.73;
+  const totalRotations = 3;
+
   const animationRef = useRef<number>(0);
   const frameRef = useRef<number>(0);
   const lastTrailSpawnRef = useRef<number>(0);
 
-  const orbitRadius = isMobile ? size * 0.42 : size * 0.48;
-  const omSize = isMobile ? 36 : 52;
-  
-  const appearDuration = 3.0;
-  const orbitSpeed = isMobile ? 0.0025 : 0.003;
-  const totalRotations = 3;
-  const vanishDuration = 4.0;
+  // Transform for Om rotation
+  const omRotation = useTransform(orbitAngle, (angle) => angle + 90);
+  const omX = useTransform(orbitAngle, (angle) => Math.cos(angle * Math.PI / 180) * orbitRadius);
+  const omY = useTransform(orbitAngle, (angle) => Math.sin(angle * Math.PI / 180) * orbitRadius);
 
   useEffect(() => {
     return () => {
@@ -44,85 +74,85 @@ export function LordGanesha({ size = 400 }: LordGaneshaProps) {
     };
   }, []);
 
-  const handleTap = useCallback(async () => {
+  const handleTap = useCallback(() => {
     if (isAnimating) return;
     
     setIsAnimating(true);
     setShowOm(true);
-    setOrbitAngle(-90);
+    orbitAngle.set(-90);
+    omOpacity.set(0);
+    omScale.set(0);
     setTrailParticles([]);
     animationRef.current++;
     const currentAnimation = animationRef.current;
     lastTrailSpawnRef.current = 0;
 
-    blessingControls.start({
-      scale: [1, 1.4],
-      opacity: [0, 0.4, 0],
-      transition: { duration: 2.5, ease: "easeOut" }
-    });
-
-    await omControls.start({
-      scale: 1,
-      opacity: 1,
-      x: 0,
-      y: 0,
-      transition: { duration: appearDuration, ease: "easeInOut" }
-    });
-
-    if (currentAnimation !== animationRef.current) return;
-
     let angle = -90;
     const targetAngle = -90 + 360 * totalRotations;
+    let phase: "appear" | "orbit" | "vanish" = "appear";
+    let phaseProgress = 0;
+    const appearDuration = 60;
+    const vanishDuration = 45;
     
     const animate = (time: number) => {
       if (currentAnimation !== animationRef.current) return;
-      
-      angle += orbitSpeed * 60;
-      setOrbitAngle(angle);
 
-      const currentX = Math.cos(angle * Math.PI / 180) * orbitRadius;
-      const currentY = Math.sin(angle * Math.PI / 180) * orbitRadius;
+      if (phase === "appear") {
+        phaseProgress++;
+        const progress = Math.min(phaseProgress / appearDuration, 1);
+        omOpacity.set(progress);
+        omScale.set(progress);
+        if (progress >= 1) {
+          phase = "orbit";
+          phaseProgress = 0;
+        }
+      } else if (phase === "orbit") {
+        angle += orbitSpeed;
+        orbitAngle.set(angle);
 
-      // Spawn trail particle every 150ms
-      if (time - lastTrailSpawnRef.current > 150) {
-        lastTrailSpawnRef.current = time;
-        setTrailParticles(prev => {
-          const newParticle = {
-            id: time,
-            x: currentX,
-            y: currentY,
-            size: (isMobile ? 3 : 5) + Math.random() * 4,
-            duration: 4.0 + Math.random() * 2.0,
-          };
-          return [...prev.slice(-30), newParticle];
-        });
+        const currentX = Math.cos(angle * Math.PI / 180) * orbitRadius;
+        const currentY = Math.sin(angle * Math.PI / 180) * orbitRadius;
+
+        if (time - lastTrailSpawnRef.current > (isMobile ? 16 : 10)) {
+          lastTrailSpawnRef.current = time;
+          setTrailParticles(prev => {
+            const maxParticles = isMobile ? 120 : 200;
+            const newParticle = {
+              id: performance.now() + Math.random(),
+              x: currentX + (Math.random() - 0.5) * 15,
+              y: currentY + (Math.random() - 0.5) * 15,
+              size: (isMobile ? 2 : 4) + Math.random() * 6,
+              duration: 1.2 + Math.random() * 1.2, // Slightly shorter duration for snappier feel
+              opacity: 0.4 + Math.random() * 0.6,
+            };
+            return [...prev.slice(-(maxParticles - 1)), newParticle];
+          });
+        }
+        
+        if (angle >= targetAngle) {
+          phase = "vanish";
+          phaseProgress = 0;
+        }
+      } else if (phase === "vanish") {
+        phaseProgress++;
+        const progress = Math.min(phaseProgress / vanishDuration, 1);
+        omOpacity.set(1 - progress);
+        omScale.set(1 - progress);
+        if (progress >= 1) {
+          setShowOm(false);
+          setTrailParticles([]);
+          setIsAnimating(false);
+          return;
+        }
       }
       
-      if (angle < targetAngle) {
+      if (phase !== "vanish" || phaseProgress < vanishDuration) {
         frameRef.current = requestAnimationFrame(animate);
-      } else {
-        // Return to center and vanish slowly
-        omControls.start({
-          x: 0,
-          y: 0,
-          scale: 0,
-          opacity: 0,
-          transition: { duration: vanishDuration, ease: "easeInOut" }
-        }).then(() => {
-          if (currentAnimation === animationRef.current) {
-            setShowOm(false);
-            setTrailParticles([]);
-            setIsAnimating(false);
-          }
-        });
       }
     };
     
     frameRef.current = requestAnimationFrame(animate);
-  }, [isAnimating, blessingControls, omControls, isMobile, orbitRadius, orbitSpeed]);
-
-  const omX = Math.cos((orbitAngle) * Math.PI / 180) * orbitRadius;
-  const omY = Math.sin((orbitAngle) * Math.PI / 180) * orbitRadius;
+  }, [isAnimating, isMobile, orbitRadius, orbitSpeed, totalRotations, orbitAngle, omOpacity, omScale]);
 
   return (
     <motion.div
@@ -140,62 +170,51 @@ export function LordGanesha({ size = 400 }: LordGaneshaProps) {
         transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
       />
 
-      <motion.div
-        className="absolute inset-0 rounded-full border-2 border-amber-400/30 blur-sm pointer-events-none"
-        animate={blessingControls}
-        initial={{ scale: 1, opacity: 0 }}
-      />
-
       <AnimatePresence>
         {showOm && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-50">
-            {/* Trail Particles */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ zIndex: 200 }}>
             {trailParticles.map((p) => (
-              <motion.div
-                key={p.id}
-                className="absolute rounded-full bg-amber-400"
-                style={{
-                  width: p.size,
-                  height: p.size,
-                  x: p.x,
-                  y: p.y,
-                  background: "radial-gradient(circle, rgba(251,191,36,1) 0%, rgba(251,191,36,0.6) 50%, transparent 100%)",
-                  boxShadow: "0 0 10px rgba(251,191,36,0.8), 0 0 20px rgba(251,191,36,0.4)",
-                  filter: "blur(0.5px)",
-                }}
-                initial={{ opacity: 0.8, scale: 1 }}
-                animate={{ opacity: 0, scale: 0.2 }}
-                transition={{ duration: p.duration, ease: "easeOut" }}
-              />
+              <Particle key={p.id} p={p} />
             ))}
 
-            {/* Main Om Icon */}
             <motion.div
               style={{ 
+                position: "absolute",
                 width: omSize, 
                 height: omSize,
-                x: isAnimating ? omX : 0,
-                y: isAnimating ? omY : 0,
+                left: "50%",
+                top: "50%",
+                marginLeft: -omSize / 2,
+                marginTop: -omSize / 2,
+                x: omX,
+                y: omY,
+                opacity: omOpacity,
+                scale: omScale,
+                zIndex: 201,
+                filter: "drop-shadow(0 0 20px rgba(251,191,36,1)) drop-shadow(0 0 40px rgba(251,191,36,0.8))",
+                willChange: "transform, opacity",
               }}
-              initial={{ scale: 0, opacity: 0, x: 0, y: 0 }}
-              animate={omControls}
             >
               <motion.div 
-                className="relative"
                 style={{ 
-                  filter: "drop-shadow(0 0 16px rgba(251,191,36,1)) drop-shadow(0 0 32px rgba(251,191,36,0.7))",
+                  width: "100%", 
+                  height: "100%",
+                  rotate: omRotation,
                 }}
-                animate={{ rotate: orbitAngle + 90 }}
-                transition={{ duration: 0 }}
               >
-                <Image src="/icons/om.svg" alt="Om" width={omSize} height={omSize} priority />
+                <Image 
+                  src="/icons/om.svg" 
+                  alt="Om" 
+                  width={omSize} 
+                  height={omSize} 
+                  priority 
+                />
               </motion.div>
             </motion.div>
           </div>
         )}
       </AnimatePresence>
 
-      
       <div className="relative w-full h-full flex items-center justify-center">
         <Image
           src="https://pngimg.com/uploads/ganesha/ganesha_PNG34.png"

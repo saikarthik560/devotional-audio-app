@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useMotionValue, useSpring, useTransform, useAnimation } from "framer-motion";
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback, useMemo, memo } from "react";
 import Image from "next/image";
 import { useIsMobile } from "@/hooks/useMediaQuery";
 
@@ -26,79 +26,6 @@ interface ParticleSystemProps {
 
 const DEFAULT_ICONS = ["/icons/lotus.svg", "/icons/om.svg", "/icons/star.svg", "/icons/bell.svg"];
 
-export function ParticleSystem({
-  count: propCount,
-  icons = DEFAULT_ICONS,
-  audioIntensity = 0,
-  interactive = true,
-  layer = "foreground",
-}: ParticleSystemProps) {
-  const [mounted, setMounted] = useState(false);
-  const isMobile = useIsMobile();
-  
-  // Reduce count on mobile
-  const count = useMemo(() => {
-    const baseCount = propCount || (layer === "foreground" ? 15 : 20);
-    return isMobile ? Math.floor(baseCount * 0.4) : baseCount;
-  }, [propCount, isMobile, layer]);
-
-  const [particles, setParticles] = useState<Particle[]>([]);
-  const mouseX = useMotionValue(0.5);
-  const mouseY = useMotionValue(0.5);
-  
-  const springX = useSpring(mouseX, { stiffness: 30, damping: 20 });
-  const springY = useSpring(mouseY, { stiffness: 30, damping: 20 });
-
-  useEffect(() => {
-    setMounted(true);
-    const newParticles = Array.from({ length: count }, (_, i) => ({
-      id: i,
-      icon: icons[i % icons.length],
-      initialX: Math.random() * 100,
-      initialY: Math.random() * 100,
-      size: layer === "foreground" ? 20 + Math.random() * 20 : 10 + Math.random() * 15,
-      delay: Math.random() * 30,
-      duration: layer === "foreground" ? 20 + Math.random() * 15 : 30 + Math.random() * 20,
-      opacity: layer === "foreground" ? 0.3 + Math.random() * 0.4 : 0.1 + Math.random() * 0.2,
-    }));
-    setParticles(newParticles);
-  }, [count, icons, layer]);
-
-  const handleMouseMove = useCallback((e: MouseEvent | TouchEvent) => {
-    isMobile ? null : (() => {
-      const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
-      const clientY = "touches" in e ? e.touches[0].clientY : e.clientY;
-      mouseX.set(clientX / window.innerWidth);
-      mouseY.set(clientY / window.innerHeight);
-    })();
-  }, [mouseX, mouseY, isMobile]);
-
-  useEffect(() => {
-    (!interactive || isMobile) ? null : window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, [handleMouseMove, interactive, isMobile]);
-
-  return !mounted ? null : (
-    <div
-      className="fixed inset-0 overflow-hidden pointer-events-none"
-      style={{ zIndex: layer === "foreground" ? 70 : 5 }}
-    >
-      {particles.map((particle) => (
-        <ParticleItem
-          key={particle.id}
-          particle={particle}
-          springX={springX}
-          springY={springY}
-          audioIntensity={audioIntensity}
-          interactive={interactive}
-          layer={layer}
-          isMobile={isMobile}
-        />
-      ))}
-    </div>
-  );
-}
-
 interface ParticleItemProps {
   particle: Particle;
   springX: any;
@@ -109,7 +36,7 @@ interface ParticleItemProps {
   isMobile: boolean;
 }
 
-function ParticleItem({
+const ParticleItem = memo(({
   particle,
   springX,
   springY,
@@ -117,7 +44,7 @@ function ParticleItem({
   interactive,
   layer,
   isMobile,
-}: ParticleItemProps) {
+}: ParticleItemProps) => {
     const influence = layer === "foreground" ? 100 : 50;
     const controls = useAnimation();
     
@@ -127,7 +54,7 @@ function ParticleItem({
     const scaleBase = 1 + audioIntensity * 0.3;
     const glowIntensity = audioIntensity * 0.5;
 
-    const handleInteraction = async () => {
+    const handleInteraction = useCallback(async () => {
       if (!interactive) return;
       await controls.start({
         scale: scaleBase * 1.5,
@@ -141,7 +68,7 @@ function ParticleItem({
         filter: "brightness(1) blur(0px)",
         transition: { duration: 0.8, ease: "easeInOut" }
       });
-    };
+    }, [controls, interactive, scaleBase, particle.opacity]);
 
     return (
       <motion.div
@@ -158,7 +85,7 @@ function ParticleItem({
         animate={{
           opacity: [0, particle.opacity, particle.opacity, 0],
           top: ["-10vh", "110vh"],
-          rotate: isMobile ? 0 : [0, 360], // Disable rotation on mobile
+          rotate: isMobile ? 0 : [0, 360],
           scale: [scaleBase, scaleBase * 1.1, scaleBase],
         }}
         transition={{
@@ -192,8 +119,8 @@ function ParticleItem({
           className="relative w-full h-full"
           animate={controls}
           style={{
-            // Disable expensive filter on mobile unless interacting
             filter: isMobile ? "none" : `drop-shadow(0 0 ${4 + glowIntensity * 8}px rgba(255, 200, 100, ${0.3 + glowIntensity}))`,
+            willChange: "transform, opacity, filter",
           }}
         >
           <Image
@@ -206,5 +133,78 @@ function ParticleItem({
         </motion.div>
       </motion.div>
     );
+});
 
+ParticleItem.displayName = "ParticleItem";
+
+export function ParticleSystem({
+  count: propCount,
+  icons = DEFAULT_ICONS,
+  audioIntensity = 0,
+  interactive = true,
+  layer = "foreground",
+}: ParticleSystemProps) {
+  const [mounted, setMounted] = useState(false);
+  const isMobile = useIsMobile();
+  
+  const count = useMemo(() => {
+    const baseCount = propCount || (layer === "foreground" ? 15 : 20);
+    return isMobile ? Math.floor(baseCount * 0.4) : baseCount;
+  }, [propCount, isMobile, layer]);
+
+  const [particles, setParticles] = useState<Particle[]>([]);
+  const mouseX = useMotionValue(0.5);
+  const mouseY = useMotionValue(0.5);
+  
+  const springX = useSpring(mouseX, { stiffness: 30, damping: 20 });
+  const springY = useSpring(mouseY, { stiffness: 30, damping: 20 });
+
+  useEffect(() => {
+    setMounted(true);
+    const newParticles = Array.from({ length: count }, (_, i) => ({
+      id: i,
+      icon: icons[i % icons.length],
+      initialX: Math.random() * 100,
+      initialY: Math.random() * 100,
+      size: layer === "foreground" ? 20 + Math.random() * 20 : 10 + Math.random() * 15,
+      delay: Math.random() * 30,
+      duration: layer === "foreground" ? 20 + Math.random() * 15 : 30 + Math.random() * 20,
+      opacity: layer === "foreground" ? 0.3 + Math.random() * 0.4 : 0.1 + Math.random() * 0.2,
+    }));
+    setParticles(newParticles);
+  }, [count, icons, layer]);
+
+  const handleMouseMove = useCallback((e: MouseEvent | TouchEvent) => {
+    if (isMobile) return;
+    const clientX = "touches" in e ? (e as TouchEvent).touches[0].clientX : (e as MouseEvent).clientX;
+    const clientY = "touches" in e ? (e as TouchEvent).touches[0].clientY : (e as MouseEvent).clientY;
+    mouseX.set(clientX / window.innerWidth);
+    mouseY.set(clientY / window.innerHeight);
+  }, [mouseX, mouseY, isMobile]);
+
+  useEffect(() => {
+    if (!interactive || isMobile) return;
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => window.removeEventListener("mousemove", handleMouseMove);
+  }, [handleMouseMove, interactive, isMobile]);
+
+  return !mounted ? null : (
+    <div
+      className="fixed inset-0 overflow-hidden pointer-events-none"
+      style={{ zIndex: layer === "foreground" ? 70 : 5 }}
+    >
+      {particles.map((particle) => (
+        <ParticleItem
+          key={particle.id}
+          particle={particle}
+          springX={springX}
+          springY={springY}
+          audioIntensity={audioIntensity}
+          interactive={interactive}
+          layer={layer}
+          isMobile={isMobile}
+        />
+      ))}
+    </div>
+  );
 }
