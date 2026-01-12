@@ -34,6 +34,16 @@ export function SacredCard({ poem, index }: SacredCardProps) {
     }
   };
 
+  const rippleControls = useAnimation();
+
+  const handleTap = async () => {
+    await rippleControls.start({
+      opacity: [0, 0.2, 0],
+      scale: [0.8, 1.5],
+      transition: { duration: 0.5 }
+    });
+  };
+
   if (!mounted) {
     return (
       <div className="h-[160px] rounded-2xl bg-amber-200/10 border-2 border-amber-500/10" />
@@ -51,25 +61,35 @@ export function SacredCard({ poem, index }: SacredCardProps) {
           y: -8, 
           scale: 1.02,
         }}
-        whileTap={{ scale: 0.97 }}
+        whileTap={{ scale: 0.96 }}
+        onTap={handleTap}
         style={{
           touchAction: "pan-y",
         }}
       >
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-300 via-amber-200 to-amber-100 border-2 border-amber-500 shadow-xl shadow-black/40">
-          {/* Shine effect */}
+          {/* Ripple Effect */}
           <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none"
-            animate={{
-              x: ["-200%", "200%"],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              repeatDelay: 4,
-              ease: "easeInOut",
-            }}
+            className="absolute inset-0 bg-white pointer-events-none rounded-2xl"
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={rippleControls}
           />
+          
+          {/* Shine effect - Reduced for mobile performance */}
+          {!isMobile && (
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent pointer-events-none"
+              animate={{
+                x: ["-200%", "200%"],
+              }}
+              transition={{
+                duration: 3,
+                repeat: Infinity,
+                repeatDelay: 4,
+                ease: "easeInOut",
+              }}
+            />
+          )}
 
           <div className="relative p-5 md:p-6">
             <div className="flex items-center gap-4 md:gap-5">

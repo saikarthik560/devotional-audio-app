@@ -40,10 +40,11 @@ export function SacredButton({
     await controls.start({
       boxShadow: [
         "0 0 20px rgba(218, 165, 32, 0.2)",
-        "0 0 60px rgba(218, 165, 32, 0.6)",
+        "0 0 80px rgba(218, 165, 32, 0.8)",
         "0 0 20px rgba(218, 165, 32, 0.2)",
       ],
-      transition: { duration: 0.4 }
+      scale: [1, 0.9, 1],
+      transition: { duration: 0.3 }
     });
     if (onClick) onClick();
   };
@@ -53,8 +54,8 @@ export function SacredButton({
       className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
       onTap={handleTap}
       disabled={disabled}
-      whileHover={{ scale: 1.02, y: -2 }}
-      whileTap={{ scale: 0.92 }}
+      whileHover={isMobile ? {} : { scale: 1.02, y: -2 }}
+      whileTap={{ scale: 0.94 }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{

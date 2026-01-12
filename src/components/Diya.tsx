@@ -33,8 +33,14 @@ export function Diya({ size = 120, glowIntensity = 1, audioLevel = 0 }: DiyaProp
     flicker();
   }, [controls, isTouched, isMobile]);
 
-  const handleTouch = () => {
+  const handleTouch = async () => {
     setIsTouched(true);
+    // Flare effect
+    await controls.start({
+      scale: [1, 1.5, 1],
+      opacity: [0.8, 1, 0.8],
+      transition: { duration: 0.3, ease: "easeOut" }
+    });
     setTimeout(() => setIsTouched(false), 2000);
   };
 

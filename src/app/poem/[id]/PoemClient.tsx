@@ -75,6 +75,17 @@ export function PoemClient({ poem }: PoemClientProps) {
     seek(percent * duration);
   };
 
+  const shimmerControls = useAnimation();
+
+  const handleDeityTap = async (e: React.MouseEvent | React.TouchEvent) => {
+    e.stopPropagation(); // Don't exit sacred mode
+    await shimmerControls.start({
+      opacity: [0.6, 1, 0.6],
+      filter: ["brightness(1) blur(0px)", "brightness(1.5) blur(2px)", "brightness(1) blur(0px)"],
+      transition: { duration: 0.8 }
+    });
+  };
+
   return (
     <div
       className="relative min-h-screen bg-[#0a0a14] overflow-x-hidden"
@@ -272,35 +283,43 @@ export function PoemClient({ poem }: PoemClientProps) {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
         >
-          <motion.div
-            className="relative mb-10"
-            animate={{ scale: 1 + audioLevel * 0.1 }}
-          >
             <motion.div
-              className="absolute inset-0 rounded-full"
-              animate={{
-                boxShadow: [
-                  `0 0 ${80 + audioLevel * 100}px ${30 + audioLevel * 50}px rgba(218, 165, 32, ${0.1 + audioLevel * 0.2})`,
-                  `0 0 ${120 + audioLevel * 140}px ${45 + audioLevel * 70}px rgba(218, 165, 32, ${0.15 + audioLevel * 0.25})`,
-                  `0 0 ${80 + audioLevel * 100}px ${30 + audioLevel * 50}px rgba(218, 165, 32, ${0.1 + audioLevel * 0.2})`,
-                ],
-              }}
-              transition={{ duration: 4, repeat: Infinity }}
-            />
+              className="relative mb-10"
+              animate={{ scale: 1 + audioLevel * 0.1 }}
+              whileTap={{ scale: 0.95 }}
+              onTap={handleDeityTap}
+            >
+              <motion.div
+                className="absolute inset-0 rounded-full"
+                animate={{
+                  boxShadow: [
+                    `0 0 ${80 + audioLevel * 100}px ${30 + audioLevel * 50}px rgba(218, 165, 32, ${0.1 + audioLevel * 0.2})`,
+                    `0 0 ${120 + audioLevel * 140}px ${45 + audioLevel * 70}px rgba(218, 165, 32, ${0.15 + audioLevel * 0.25})`,
+                    `0 0 ${80 + audioLevel * 100}px ${30 + audioLevel * 50}px rgba(218, 165, 32, ${0.1 + audioLevel * 0.2})`,
+                  ],
+                }}
+                transition={{ duration: 4, repeat: Infinity }}
+              />
 
-            <div className="relative w-48 h-48 md:w-64 md:h-64 rounded-full overflow-hidden border border-amber-500/10 shadow-2xl">
-              {poem.hasDeityImage ? (
-                <Image 
-                  src={poem.deityImageUrl} 
-                  alt={poem.deity} 
-                  fill 
-                  className="object-cover opacity-60 mix-blend-lighten" 
-                />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-amber-950/20 to-slate-900/40 flex items-center justify-center">
-                  <Image src="/icons/om.svg" alt="Om" width={100} height={100} className="opacity-20" />
-                </div>
-              )}
+              <div className="relative w-48 h-48 md:w-64 md:h-64 rounded-full overflow-hidden border border-amber-500/10 shadow-2xl">
+                {poem.hasDeityImage ? (
+                  <motion.div
+                    className="relative w-full h-full"
+                    animate={shimmerControls}
+                  >
+                    <Image 
+                      src={poem.deityImageUrl} 
+                      alt={poem.deity} 
+                      fill 
+                      className="object-cover opacity-60 mix-blend-lighten" 
+                    />
+                  </motion.div>
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-amber-950/20 to-slate-900/40 flex items-center justify-center">
+                    <Image src="/icons/om.svg" alt="Om" width={100} height={100} className="opacity-20" />
+                  </div>
+                )}
+
               
               {/* Sacred Overlay */}
               <div className="absolute inset-0 flex items-center justify-center pointer-events-none">

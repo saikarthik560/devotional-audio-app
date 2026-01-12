@@ -1,8 +1,9 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useAnimation } from "framer-motion";
 import Image from "next/image";
 import { useIsMobile } from "@/hooks/useMediaQuery";
+import { useState } from "react";
 
 interface LordGaneshaProps {
   size?: number;
@@ -11,13 +12,31 @@ interface LordGaneshaProps {
 export function LordGanesha({ size = 400 }: LordGaneshaProps) {
   const isMobile = useIsMobile();
   const rayCount = isMobile ? 4 : 8;
+  const blessingControls = useAnimation();
+  const [isBlessing, setIsBlessing] = useState(false);
+
+  const handleTap = async () => {
+    if (isBlessing) return;
+    setIsBlessing(true);
+    
+    // Trigger blessing ripple
+    await blessingControls.start({
+      scale: [1, 2],
+      opacity: [0, 0.5, 0],
+      transition: { duration: 1, ease: "easeOut" }
+    });
+    
+    setIsBlessing(false);
+  };
 
   return (
     <motion.div
-      className="relative flex items-center justify-center"
+      className="relative flex items-center justify-center cursor-pointer touch-manipulation"
       style={{ width: size, height: size, willChange: "transform, opacity" }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
+      whileTap={{ scale: 0.95 }}
+      onTap={handleTap}
       transition={{ duration: 2, ease: "easeOut" }}
     >
       {/* Divine Aura / Glow */}
@@ -33,6 +52,13 @@ export function LordGanesha({ size = 400 }: LordGaneshaProps) {
           ease: "easeInOut",
         }}
         style={{ willChange: "transform, opacity" }}
+      />
+
+      {/* Blessing Ripple Effect */}
+      <motion.div
+        className="absolute inset-0 rounded-full border-2 border-amber-400/30 blur-sm pointer-events-none"
+        animate={blessingControls}
+        initial={{ scale: 1, opacity: 0 }}
       />
       
       <div className="relative w-full h-full flex items-center justify-center">
